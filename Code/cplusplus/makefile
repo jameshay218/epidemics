@@ -1,14 +1,17 @@
 CXXFLAGS = -Wall -g
 CXX = g++
 
-main: main.o sir.o
-	$(CXX) $(CXXFLAGS) main.o sir.o -o main -lboost_system -lboost_iostreams -lboost_filesystem
+main: main.o sir.o datahandler.o
+	$(CXX) $(CXXFLAGS) main.o sir.o datahandler.o -o main -lboost_system -lboost_iostreams -lboost_filesystem
 
-main.o: main.cpp sir.hpp
+main.o: main.cpp sir.hpp datahandler.hpp
 	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
 
 sir.o: sir.cpp sir.hpp
 	$(CXX) $(CXXFLAGS) -c sir.cpp -o sir.o
+
+datahandler.o: datahandler.cpp datahandler.hpp
+	$(CXX) $(CXXFLAGS) -c datahandler.cpp -o datahandler.o
 
 clean:
 	rm -f *.o
