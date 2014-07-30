@@ -3,7 +3,7 @@ using namespace std;
 
 #include "sir.hpp"
 
-SIR::SIR(double parameters[7]){
+SIR::SIR(double parameters[7], vector<vector<double> > x){
 
   beta = parameters[0];
   gamma =parameters[1];
@@ -14,11 +14,14 @@ SIR::SIR(double parameters[7]){
   R = parameters[5];
 
   tmax = parameters[6];
+  
+  current_data = x;
 }
 
 SIR::~SIR(){
   cout <<"Delete SIR"<<endl;
 }
+
 
 void SIR::Diff(double Pop[3]) {
   // The differential equations
@@ -84,10 +87,10 @@ void SIR::Solve_Eq(vector<vector<double> >& _results){
   while(t<tmax);
   }
 
-void SIR::sse_sir(double parameters[3], vector<vector<double> > data){
+double SIR::sse_sir(double parameters[3]){
   vector<vector<double> > tempData;
-  tempData.resize(data.size());
-  for(unsigned int i=0;i<=data.size();++i){
+  tempData.resize(current_data.size());
+  for(unsigned int i=0;i<current_data.size();++i){
     tempData[i].resize(4);
   }
   double sse = 0;
@@ -97,15 +100,50 @@ void SIR::sse_sir(double parameters[3], vector<vector<double> > data){
   I = 1.0;
   R = 0.0;
   Solve_Eq(tempData);
-  sse = add_arrays(data,tempData);
-  //cout << sse << endl;
+  sse = add_arrays(current_data,tempData);
+  return(sse);
 }
+
+vector<vector<double> > SIR::sse_sir2(double parameters[3]){
+  vector<vector<double> > tempData;
+  tempData.resize(current_data.size());
+  for(unsigned int i=0;i<current_data.size();++i){
+    tempData[i].resize(4);
+  }
+  double sse = 0;
+  beta = exp(parameters[0]);
+  gamma = exp(parameters[1]);
+  S = exp(parameters[2]);
+  I = 1.0;
+  R = 0.0;
+  Solve_Eq(tempData);
+  sse = add_arrays(current_data,tempData);
+  return(tempData);
+}
+
+double SIR::operator()(vector<double> param){
+  vector<vector<double> > tempData;
+  tempData.resize(current_data.size());
+  for(unsigned int i=0;i<current_data.size();++i){
+    tempData[i].resize(4);
+  }
+  double sse = 0;
+  beta = exp(param[0]);
+  gamma = exp(param[1]);
+  S = exp(param[2]);
+  I = 1.0;
+  R = 0.0;
+  Solve_Eq(tempData);
+  sse = add_arrays(current_data,tempData);
+  return(sse);
+}
+
 
 double SIR::add_arrays(vector<vector<double> > data1, vector<vector<double> > data2){
   unsigned int i = 0;
   unsigned int j = 0;
   double sse = 0;
-  while(i < data1.size() && j < data2.size()){
+  while(i < data1.size()-1 && j < data2.size()-1){
     //cout << "I: " << i << endl;
     //cout << "J: " << j << endl;
     
@@ -146,4 +184,22 @@ void SIR::user_params(){
   }
   update_params(parameters);
 }
-  
+
+void SIR::update_data(vector<vector<double> > x){
+  current_data = x;
+}
+
+vector<double> SIR::rand_params(){
+  vector<double> params;
+  double beta,gamma,s0;
+  srand(clock());
+  setprecision(9);
+  beta = (rand()%100+1)/10000.0;
+  gamma = (rand()%100+beta)/1000.0;
+  s0 = rand()%1000+100;
+  params.push_back(log(beta));
+  params.push_back(log(gamma));
+  params.push_back(log(s0));
+  return(params);
+}
+
