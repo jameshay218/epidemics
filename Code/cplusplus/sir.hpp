@@ -14,7 +14,7 @@ using namespace std;
 
 class SIR{
 private:
-  double t, step;
+  double t, step, t0;
   double S,I,R,Pop[3];
   double dPop[3];
 
@@ -29,15 +29,19 @@ public:
   void Diff(double Pop[3]);
   void Runge_Kutta();
   void Solve_Eq(vector<vector<double> >& data);
-  double sse_sir(double parameters[3]);
+  void Solve_Eq_t0(vector<vector<double> >& _results);
+
+  double sse_sir(vector<double> parameters);
+  double sse_sir_t0(vector<double> parameters);
+
   double add_arrays(vector<vector<double> > data1, vector<vector<double> > data2);
   void update_params(double parameters[7]);
   void user_params();
   void fit_model();
-  double operator()(vector<double> param);
   void update_data(vector<vector<double> > x);
-  vector<vector<double> > sse_sir2(double parameters[3]);
-  vector<double> rand_params();
+  vector<vector<double> > sse_sir2(vector<double> parameters);
+  vector<double> rand_params3();
+  vector<double> rand_params4();
 
 };
 #endif
