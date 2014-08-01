@@ -83,11 +83,10 @@ template<class D, class OP, class X>
 vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of object
 			      OP& obj,                //object to work from
 			      vector<D> init,    //initial guess of the parameters
-			      D tol=1E8*numeric_limits<D>::epsilon(), //termination criteria
+			      D tol=1E14*numeric_limits<D>::epsilon(), //termination criteria
 			      vector<vector<D> > x =  vector<vector<D> >(),
 			      //x: The Simplex
-			      int iterations=5E4){
-  
+			      int iterations=5E3){
   int N=init.size(); 
   //space dimension
   const double a=1.0, b=1.0, g=0.5, h=0.5;   //coefficients
@@ -102,6 +101,7 @@ vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of objec
   //xnp1: f(xnp1) = max { f(x1), f(x2)...f(x_{n+1} }
   //xn:   f(xn)<f(xnp1) && f(xn)> all other f(x_i)
   int cnt=0; //iteration step number
+  
   if(x.size()==0) //if no initial simplex is specified
     { //construct the trial simplex
       //based upon the initial guess parameters
@@ -211,9 +211,11 @@ vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of objec
   }//optimization is finished
 
   if(cnt==iterations){//max number of iteration achieves before tol is satisfied
-    cout<<"Iteration limit achieves, result may not be optimal"<<endl;
+    cout<<"Iteration limit achieved, result may not be optimal"<<endl;
+    //return init;
   }
   return x[x1];
+  //return init;
 }
 
 

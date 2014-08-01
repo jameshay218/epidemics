@@ -30,16 +30,20 @@ public:
   void Runge_Kutta();
   void Solve_Eq(vector<vector<double> >& data);
   void Solve_Eq_t0(vector<vector<double> >& _results);
+  void Solve_Eq_total(vector<vector<double> >& _results);
+
 
   double sse_sir(vector<double> parameters);
   double sse_sir_t0(vector<double> parameters);
-
+  double sse_sir_multi(vector<double> parameters);
+  vector<vector<double> > sse_sir3(vector<double> parameters);
+  vector<vector<double> > sse_sir2(vector<double> parameters);
+  vector<vector<double> > combine_vectors(vector<vector<double> > data1, vector<vector<double> > data2);
   double add_arrays(vector<vector<double> > data1, vector<vector<double> > data2);
   void update_params(double parameters[7]);
   void user_params();
   void fit_model();
   void update_data(vector<vector<double> > x);
-  vector<vector<double> > sse_sir2(vector<double> parameters);
   vector<double> rand_params3();
   vector<double> rand_params4();
 
