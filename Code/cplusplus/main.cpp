@@ -30,14 +30,18 @@ int main() {
   cout << "====================================================================" << endl;
   cout << "                            SIR Fitting                             " << endl;
   cout << "====================================================================" << endl << endl;
-  /*
-  dataHandler.import_data("test.csv",finalResults);
+  
+  /*dataHandler.import_data("test.csv",finalResults);
+  cout << dataHandler.calculate_mean(dataHandler.return_data(), 2) << endl;
+  dataHandler.print_vector(dataHandler.return_data());
+  finalResults = dataHandler.return_data();
+    
   double parameters[7] = {0.001, 0.1, 1.0, 500.0, 1.0, 0.0, dataHandler.return_data().size()};  
   SIR mySIR(parameters, dataHandler.return_data());
   dataHandler.print_vector(dataHandler.return_data());
   finalResults = mySIR.combine_vectors(dataHandler.return_data(), dataHandler.return_data());
-  dataHandler.print_vector(finalResults);
-  return 0;*/
+  dataHandler.print_vector(finalResults);*/
+  //return 0;
   while(true){
     /* User specifies a file which is store in an instance of the SIR class */
     cout << "--------------------------------------------------------------------" << endl;

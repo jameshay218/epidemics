@@ -37,6 +37,7 @@ void SIR::Diff(double Pop[3]) {
   dPop[2] = gamma*Pop[1];                    // dR/dt
 }
 
+
 void SIR::Runge_Kutta(){
   int i;
   double dPop1[3], dPop2[3], dPop3[3], dPop4[3];
@@ -82,7 +83,6 @@ void SIR::Runge_Kutta(){
 void SIR::Solve_Eq_t0(vector<vector<double> >& _results){
   t=0;
   int i=0;
-  //cout << "Tmax: " << tmax << endl;
   do{
     Runge_Kutta();
     _results[i][0] = t + int(t0);
@@ -98,7 +98,7 @@ void SIR::Solve_Eq_t0(vector<vector<double> >& _results){
 void SIR::Solve_Eq_total(vector<vector<double> >& _results){
   t=0;
   int i=0;
-  cout << "Tmax: " << tmax << endl;
+  //cout << "Tmax: " << tmax << endl;
   do{
     Runge_Kutta();
     _results[i][0] = t + int(t0);
@@ -111,12 +111,17 @@ void SIR::Solve_Eq_total(vector<vector<double> >& _results){
   while(t<tmax);
 }
 
+
+// Calculates the SSE for a single epidemic from a given vector of parameters
 double SIR::sse_sir_t0(vector<double> parameters){
   vector<vector<double> > tempData;
+
+  // Create a temporary vector to store ODE results
   tempData.resize(current_data.size());
   for(unsigned int i=0;i<current_data.size();++i){
     tempData[i].resize(4);
     fill(tempData[i].begin(),tempData[i].end(),0.0);
+    tempData[i][0] = i;
   }
   beta = exp(parameters[0]);
   gamma = exp(parameters[1]);
@@ -129,6 +134,7 @@ double SIR::sse_sir_t0(vector<double> parameters){
   return(sse);
 }
 
+/* Calculates from the current data set given a vector or parameters */
 double SIR::sse_sir_multi(vector<double> parameters){
   vector<vector<double> > tempData;
   vector<vector<double> > totalData;
@@ -189,7 +195,6 @@ vector<vector<double> > SIR::sse_sir3(vector<double> parameters){
   totalData = tempData;
   
   for(unsigned int k = 0; k<(parameters.size()/4);++k){
-    cout << "SIR: " << k << endl;
     beta = exp(parameters[4*k]);
     gamma = exp(parameters[1+(4*k)]);
     S = exp(parameters[2+(4*k)]);
@@ -212,6 +217,32 @@ vector<vector<double> > SIR::sse_sir3(vector<double> parameters){
 
   return(totalData);
 }
+
+
+
+vector<vector<vector<double> > > SIR::sse_sir4(vector<double> parameters){
+  vector<vector<double> > tempData;
+  vector<vector<vector<double> > > totalData;
+  tempData.resize(tmax);
+  for(unsigned int i=0;i<tmax;++i){
+    tempData[i].resize(4);
+    fill(tempData[i].begin(),tempData[i].end(),0.0);
+    tempData[i][0] = i;
+  }
+    
+  for(unsigned int k = 0; k<(parameters.size()/4);++k){
+    beta = exp(parameters[4*k]);
+    gamma = exp(parameters[1+(4*k)]);
+    S = exp(parameters[2+(4*k)]);
+    t0 = exp(parameters[3+(4*k)]);
+    I = 1.0;
+    R = 0.0;
+    Solve_Eq_total(tempData);
+    totalData.push_back(tempData);
+  }
+  return(totalData);
+}
+
 
 
 
@@ -277,8 +308,6 @@ double SIR::add_arrays(vector<vector<double> > data1, vector<vector<double> > da
   unsigned int i = 0;
   unsigned int j = 0;
   double sse = 0;
-  //cout << "Data1: " << data1.size() << endl;
-  //cout << "Data2: " << data2.size() << endl;
   while(i < data1.size() && j < data2.size()){
     //If indices give same time point, find sse
     if(data1[i][0] == data2[j][0]){
@@ -305,16 +334,17 @@ double SIR::add_arrays(vector<vector<double> > data1, vector<vector<double> > da
 vector<double> SIR::rand_params4(){
   vector<double> params;
   double beta,gamma,s0;
-  srand(clock());
+  
   setprecision(9);
   beta = (rand()%100+1)/10000.0;
   gamma = (rand()%100+beta)/1000.0;
-  s0 = rand()%10000+1000;
+  s0 = rand()%1000+100;
   t0 = rand()%50+1;
   params.push_back(log(beta));
   params.push_back(log(gamma));
   params.push_back(log(s0));
   params.push_back(log(t0));
+
   return(params);
 }
 

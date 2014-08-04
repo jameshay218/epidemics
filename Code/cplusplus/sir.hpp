@@ -47,5 +47,7 @@ public:
   vector<double> rand_params3();
   vector<double> rand_params4();
 
+  vector<vector<vector<double> > > sse_sir4(vector<double> parameters);
+
 };
 #endif

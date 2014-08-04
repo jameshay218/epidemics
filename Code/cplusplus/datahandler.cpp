@@ -11,6 +11,234 @@ Handler::~Handler(){
   cout << "Delete Data Handler" << endl;
 }
 
+void Handler::realtime_fit2(vector<vector<double> > &results, vector<double> &params, int version){
+  clock_t t1, t2;
+  double parameters[7] = {0.001, 0.1, 1.0, 500.0, 1.0, 0.0, double(current_data.size())};  
+  SIR mySIR(parameters, current_data);
+  double SSE;
+  vector<double> resultPar1;
+  vector<vector<double> > temp;
+  vector<vector<vector<double> > > allResults;
+  double tempSSE, RSquare;
+  Simplex simplex;
+  t1=clock();
+  
+  /*for(unsigned int i = 0; i<current_data.size();++i){
+    current_data[i][0] += 15;
+    }*/
+
+  for(unsigned int i = 100;i<current_data.size();++i){
+
+    SSE = 999999999999.9;
+    cout << endl << "-----------------" << endl;
+    cout << "Iteration number " << i << endl;
+
+    // Store all data up to the current index and give this to SIR
+    temp.clear();
+    for(unsigned int j = 0; j < i; ++j){
+      temp.push_back(current_data[j]);
+    } 
+    mySIR.update_data(temp);
+    
+    // Optimise fit X times
+    for(int index=0;index<100;index++){
+      //cout << "Optimise " << index << endl;
+      vector<double> par3;
+      srand(clock());
+      // Optimise for 2 SIR models
+      if(i < 20){
+	par3 = mySIR.rand_params4();
+	//par3.push_back(log(10));
+	//	par3 = mySIR.rand_params4();
+	/*par3.push_back(log(0.001));
+	par3.push_back(log(0.1));
+	par3.push_back(log(500));
+	par3.push_back(log(10));*/
+	  }
+      else if(i < 50){
+	/*par3.push_back(log(0.001));
+	par3.push_back(log(0.1));
+	par3.push_back(log(500));
+	par3.push_back(log(10));
+	  par3.push_back(log(0.001));
+	par3.push_back(log(0.05));
+	par3.push_back(log(650));
+	par3.push_back(log(30));
+	*/
+	par3 = mySIR.rand_params4();
+	par3 = concatenate_vectors(par3, mySIR.rand_params4());
+      }
+      else{
+	/*par3.push_back(log(0.001));
+	par3.push_back(log(0.1));
+	par3.push_back(log(500));
+	par3.push_back(log(10));
+	par3.push_back(log(0.001));
+	par3.push_back(log(0.05));
+	par3.push_back(log(650));
+	par3.push_back(log(30));
+	par3.push_back(log(0.0007));
+	par3.push_back(log(0.07));
+	par3.push_back(log(400));
+	par3.push_back(log(50));
+	*/
+      
+	par3 = mySIR.rand_params4();
+	par3 = concatenate_vectors(par3, mySIR.rand_params4());
+	par3 = concatenate_vectors(par3, mySIR.rand_params4());
+      }
+      
+      /*;
+
+      
+
+      
+      */
+
+      resultPar1 = simplex.neldermead(&SIR::sse_sir_multi, mySIR,  par3);
+      tempSSE = mySIR.sse_sir_multi(resultPar1);
+
+      /*cout << "Current SSE: " << tempSSE << endl;
+      cout << "Current parameters: ";
+      for(int l=0;l<resultPar1.size();++l){
+	cout << exp(resultPar1[l]) << ' ';
+      }
+      cout << endl << endl;*/
+     
+      if(tempSSE < SSE){
+	SSE = tempSSE;
+	params=resultPar1;
+      }
+    }
+    cout << "Final SSE was: " << SSE << endl;
+    results = mySIR.sse_sir3(params); 
+    allResults = mySIR.sse_sir4(params);
+    RSquare = 1 - SSE/SStot(temp, 2);
+    cout << "Final RSquare: " << RSquare << endl;
+    
+    for(unsigned int j=0;j<params.size();++j){
+      params[j] = exp(params[j]);
+    }
+    
+    cout << "Final parameters: ";
+    printcon(params) ;
+    cout << "-----------------" << endl;
+    //print_vector(results);
+    plotGraph2(allResults, results, temp, i, params, RSquare);
+  }
+  t2=clock();
+  cout << "Time taken: " << (t2-t1)/CLOCKS_PER_SEC << endl << endl;
+}
+
+
+double Handler::calculate_mean(vector<vector<double> > data, int column){
+  double total = 0;
+  int N = data.size();
+  for(int i=0;i<N;++i){
+    total += data[i][column];
+  }
+  return(total/N);
+}
+  
+double Handler::SStot(vector<vector<double> > data, int column){
+  double sum = 0;
+  double mean = calculate_mean(data, column);
+  for(unsigned int i =0; i<data.size();++i){
+    sum += pow((data[i][column]-mean),2.0);
+  }
+  return(sum);
+}
+
+
+
+/* ======================================== OLD ========================================= */
+
+
+void Handler::realtime_fit(vector<vector<double> > &results, vector<double> &params, int version){
+  clock_t t1, t2;
+  double parameters[7] = {0.001, 0.1, 1.0, 500.0, 1.0, 0.0, double(current_data.size())};  
+  SIR mySIR(parameters, current_data);
+  double SSE;
+  vector<double> resultPar;
+  vector<vector<double> > temp;
+  double tempSSE, RSquare;
+  Simplex simplex;
+  
+  t1=clock();
+ 
+  /* Added artificial t0 delay of 15 */
+  for(unsigned int i = 0; i<current_data.size();++i){
+    current_data[i][0] += 15;
+    }
+  
+
+  for(unsigned int i = 60;i<current_data.size();++i){
+    SSE = 999999999999.9;
+    cout << endl << "-----------------" << endl;
+    cout << "Iteration number " << i << endl;
+
+    // Store all data up to the current index and give this to SIR
+    temp.clear();
+    for(unsigned int j = 0; j < i; ++j){
+      temp.push_back(current_data[j]);
+    } 
+    mySIR.update_data(temp);
+    
+    // Optimise fit 50 times
+    for(int index=0;index<=100;index++){
+      //cout << "Optimise " << index << endl;
+      srand(clock());
+      vector<double> par2;
+      // Optimise for 3 or 4 parameters
+      switch(version){
+      case 1:
+	par2= mySIR.rand_params3();
+	resultPar = simplex.neldermead(&SIR::sse_sir, mySIR,  par2);
+	tempSSE = mySIR.sse_sir(resultPar);
+	break;
+      case 2:
+	par2 = mySIR.rand_params4();
+	resultPar = simplex.neldermead(&SIR::sse_sir_t0, mySIR,  par2);
+	tempSSE = mySIR.sse_sir_t0(resultPar);
+	break;
+     
+      }
+      
+      /*cout << "Current SSE: " << tempSSE << endl;
+      cout << "Current params: ";
+      for(int k = 0; k < resultPar.size(); ++k){
+	cout << resultPar[k] << ' ';
+      }
+      cout << endl << endl;*/
+      
+      if(tempSSE < SSE){
+	SSE = tempSSE;
+	params=resultPar;
+      }
+    }
+    
+    cout << "Final SSE was: " << SSE << endl;
+    results = mySIR.sse_sir2(params);  
+    RSquare = 1 - SSE/SStot(temp, 2);
+    cout << "Final RSquare: " << RSquare << endl;
+    for(unsigned int j=0;j<params.size();++j){
+      params[j] = exp(params[j]);
+    }
+    
+    cout << "Final parameters: ";
+    printcon(params) ;
+    cout << "-----------------" << endl;
+    plotGraph(results, temp, i);
+    //print_vector(temp);
+  }
+  t2=clock();
+  cout << "Time taken: " << (t2-t1)/CLOCKS_PER_SEC << endl << endl;
+}
+
+
+
+
+
 
 double Handler::import_data(const char* file, vector<vector<double> > _results){
   ifstream in_stream;
@@ -57,92 +285,20 @@ void Handler::print_vector(vector< vector<double> > my_data){
   }
 }
   
-void Handler::realtime_fit(vector<vector<double> > &results, vector<double> &params, int version){
-  clock_t t1, t2;
+
+void Handler::testAddition(vector<vector<double> > data1, vector<vector<double> > data2, double offset){
   double parameters[7] = {0.001, 0.1, 1.0, 500.0, 1.0, 0.0, double(current_data.size())};  
   SIR mySIR(parameters, current_data);
-  double SSE;
-  vector<double> resultPar;
-  vector<vector<double> > temp;
-  double tempSSE;
-  Simplex simplex;
-  
-  t1=clock();
-  /*
-  cout << "Current data size: " << current_data.size() << endl;
-  current_data.resize(current_data.size()-15);
-  cout << "Now data size: " << current_data.size() << endl;
-  */
-  for(unsigned int i = 0; i<current_data.size();++i){
-    current_data[i][0] += 15;
+  for(unsigned int i = 0; i<data2.size();++i){
+    data2[i][0] += (int)offset;
   }
-  
+  cout << mySIR.add_arrays(data1,data2) << endl;
+  plotGraph(data1,data2,100);
 
-  for(unsigned int i = 60;i<current_data.size();++i){
-    SSE = 999999999999.9;
-    cout << endl << "-----------------" << endl;
-    cout << "Iteration number " << i << endl;
-
-    // Store all data up to the current index and give this to SIR
-    temp.clear();
-    for(unsigned int j = 0; j < i; ++j){
-      temp.push_back(current_data[j]);
-    } 
-    mySIR.update_data(temp);
-    
-    // Optimise fit 50 times
-    for(int index=0;index<=100;index++){
-      //cout << "Optimise " << index << endl;
-      vector<double> par2;
-      // Optimise for 3 or 4 parameters
-      switch(version){
-      case 1:
-	par2= mySIR.rand_params3();
-	resultPar = simplex.neldermead(&SIR::sse_sir, mySIR,  par2);
-	tempSSE = mySIR.sse_sir(resultPar);
-	break;
-      case 2:
-	par2 = mySIR.rand_params4();
-	resultPar = simplex.neldermead(&SIR::sse_sir_t0, mySIR,  par2);
-	tempSSE = mySIR.sse_sir_t0(resultPar);
-	break;
-     
-      }
-      
-      //cout << "Current SSE: " << tempSSE << endl;
-      /*cout << "Current params: ";
-      for(int k = 0; k < resultPar.size(); ++k){
-	cout << resultPar[k] << ' ';
-      }
-      cout << endl << endl;*/
-      
-      if(tempSSE < SSE){
-	SSE = tempSSE;
-	params=resultPar;
-      }
-    }
-    
-    cout << "Final SSE was: " << SSE << endl;
-    results = mySIR.sse_sir2(params);  
-    
-    for(unsigned int j=0;j<params.size();++j){
-      params[j] = exp(params[j]);
-    }
-    
-    cout << "Final parameters: ";
-    printcon(params) ;
-    cout << "-----------------" << endl;
-    plotGraph(results, temp, i);
-    //print_vector(temp);
-  }
-  t2=clock();
-  cout << "Time taken: " << (t2-t1)/CLOCKS_PER_SEC << endl << endl;
 }
 
 
-  
 
-  
 void Handler::plotGraph(vector<vector<double> > finalResults, vector<vector<double> > data, int index){
   Gnuplot gp;
   string name = "graphs/output";
@@ -159,107 +315,38 @@ void Handler::plotGraph(vector<vector<double> > finalResults, vector<vector<doub
   
 }
 
-void Handler::testAddition(vector<vector<double> > data1, vector<vector<double> > data2, double offset){
-  double parameters[7] = {0.001, 0.1, 1.0, 500.0, 1.0, 0.0, double(current_data.size())};  
-  SIR mySIR(parameters, current_data);
-  for(unsigned int i = 0; i<data2.size();++i){
-    data2[i][0] += (int)offset;
-  }
-  cout << mySIR.add_arrays(data1,data2) << endl;
-  plotGraph(data1,data2,100);
 
+
+void Handler::plotGraph2(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare){
+  Gnuplot gp;
+  string name = "graphs/output";
+  string _index = to_string(index);
+  string label, xlab;
+  xlab = "RSquare: " + to_string(_RSquare);
+  name = name + _index + ".jpeg";
+
+  gp << "set terminal jpeg size 1000,800 enhanced font \"Helvetica, 10\" termpostscript eps enhanced\n";
+  gp << "set key font \",4\"\n";
+  gp << "set format x \"%.2e\"\n";
+  gp << "set xlabel '" << xlab << "'\n";
+  gp << "set output '" << name << "'\n";
+  gp << "plot '-' using 1:3 with linespoints title 'Data'";
+  gp << ", '-' using 1:3 with lines lw 2 title 'Total'";
+  for(unsigned int i = 0;i<finalResults.size();++i){
+    label = "Sub-Epidemic " + to_string(i) + " (" + "beta: " + to_string(parameters[4*i]) +  "; gamma: " + to_string(parameters[1+4*i]) +  "; S0: " + to_string(parameters[2+4*i]) + "; T0: " + to_string(parameters[3+4*i]) + ")";
+    gp << ", '-' using 1:3 with lines title '" << label << "'";
+  }
+  gp << "\n";
+  gp.send1d(data);
+  gp.send1d(totalResults);
+  for(unsigned int j = 0;j<finalResults.size();++j){
+    gp.send1d(finalResults[j]);
+  }
+
+  
 }
 
 
-void Handler::realtime_fit2(vector<vector<double> > &results, vector<double> &params, int version){
-  clock_t t1, t2;
-  double parameters[7] = {0.001, 0.1, 1.0, 500.0, 1.0, 0.0, double(current_data.size())};  
-  SIR mySIR(parameters, current_data);
-  double SSE;
-  vector<double> resultPar1;
-  vector<vector<double> > temp;
-  double tempSSE;
-  Simplex simplex;
-  
-  t1=clock();
-  
-  /*for(unsigned int i = 0; i<current_data.size();++i){
-    current_data[i][0] += 15;
-    }*/
-
-  for(unsigned int i = 125;i<current_data.size();++i){
-    SSE = 999999999999.9;
-    cout << endl << "-----------------" << endl;
-    cout << "Iteration number " << i << endl;
-
-    // Store all data up to the current index and give this to SIR
-    temp.clear();
-    for(unsigned int j = 0; j < i; ++j){
-      temp.push_back(current_data[j]);
-    } 
-    mySIR.update_data(temp);
-    
-    // Optimise fit 50 times
-    for(int index=0;index<=40;index++){
-      //cout << "Optimise " << index << endl;
-      vector<double> par3;
-      // Optimise for 2 SIR models
-      par3 = mySIR.rand_params4();
-      par3 = concatenate_vectors(par3, mySIR.rand_params4());
-      //par3 = concatenate_vectors(par3, mySIR.rand_params4());
-      //cout << par3.size() << endl;
-      /*if(i < 30){
-	par3 = mySIR.rand_params4();
-	par3 = concatenate_vectors(par3, mySIR.rand_params4());
-      }
-      else{
-	par3 = mySIR.rand_params4();
-      }
-      */
-
-      /*
-      par3.push_back(log(0.001));
-      par3.push_back(log(0.1));
-      par3.push_back(log(500));
-      par3.push_back(log(10));
-
-      par3.push_back(log(0.001));
-      par3.push_back(log(0.05));
-      par3.push_back(log(650));
-      par3.push_back(log(30));
-
-      */
-      resultPar1 = simplex.neldermead(&SIR::sse_sir_multi, mySIR,  par3);
-      tempSSE = mySIR.sse_sir_multi(resultPar1);
-
-      /*cout << "Current SSE: " << tempSSE << endl;
-      cout << "Current parameters: ";
-      for(int l=0;l<resultPar1.size();++l){
-	cout << exp(resultPar1[l]) << ' ';
-      }
-      cout << endl << endl;*/
-
-      if(tempSSE < SSE){
-	SSE = tempSSE;
-	params=resultPar1;
-      }
-    }
-    cout << "Final SSE was: " << SSE << endl;
-    results = mySIR.sse_sir3(params);  
-    
-    for(unsigned int j=0;j<params.size();++j){
-      params[j] = exp(params[j]);
-    }
-    
-    cout << "Final parameters: ";
-    printcon(params) ;
-    cout << "-----------------" << endl;
-    //print_vector(results);
-    plotGraph(results, temp, i);
-  }
-  t2=clock();
-  cout << "Time taken: " << (t2-t1)/CLOCKS_PER_SEC << endl << endl;
-}
 
 vector<double> Handler::concatenate_vectors(vector<double> a, vector<double> b){
   for(unsigned int i =0; i<b.size();++i){
@@ -267,3 +354,4 @@ vector<double> Handler::concatenate_vectors(vector<double> a, vector<double> b){
   }
   return(a);
 }
+
