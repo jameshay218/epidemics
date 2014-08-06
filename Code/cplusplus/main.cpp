@@ -62,7 +62,7 @@ int main() {
       cout << "--------------------------------------------------------------------" << endl;
       cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
       cout << "--------------------------------------------------------------------" << endl;
-      dataHandler.import_data(file, finalResults);
+      dataHandler.import_data(file);
       //dataHandler.plotGraph(dataHandler.return_data(), finalResults, 250);
       //dataHandler.testAddition(dataHandler.return_data(), dataHandler.return_data(), 10.31521361);
       dataHandler.realtime_fit(finalResults, finalParams, 2);
@@ -78,8 +78,9 @@ int main() {
       cout << "--------------------------------------------------------------------" << endl;
       cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
       cout << "--------------------------------------------------------------------" << endl;
-      dataHandler.import_data(file, finalResults);
-      dataHandler.realtime_fit2(finalResults, finalParams, 2);
+      dataHandler.import_data(file);
+      dataHandler.realtime_fit_multi(finalParams, 2);
+      //dataHandler.test_detect(finalResults,finalParams);
       break;
     }
 
