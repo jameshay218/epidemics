@@ -11,8 +11,55 @@ Handler::~Handler(){
   cout << "Delete Data Handler" << endl;
 }
 
+void Handler::likelihood_test(vector<double> &params){
+  vector<double> parameters, tempParams;
+  vector<vector<int> > data, model;
+  SIR mySIR(double(current_data.size()), current_data);
+  Simplex simplex;
+  parameters.push_back(log(0.001));
+  parameters.push_back(log(0.1));
+  parameters.push_back(log(500));
+  parameters.push_back(log(10));
+  
+  data = mySIR.combined_model(parameters);
+  print_vector(data);
+  //long temp = 222;
+  //mySIR.factorial(temp);
+  /*mySIR.update_data(data);
 
-void Handler::realtime_fit_multi(vector<double> &params, int version){
+  parameters.clear();
+  parameters.push_back(log(0.0005));
+  parameters.push_back(log(0.11));
+
+
+  cout << "Test: " << mySIR.mle_sir(parameters) << endl;
+
+  tempParams = simplex.neldermead(&SIR::mle_sir, mySIR,  parameters);
+  cout << "Final log likelihood: " << mySIR.mle_sir(tempParams) << endl;
+  tempParams.push_back(log(500));
+  tempParams.push_back(log(10));
+  parameters.clear();
+  parameters.push_back(log(0.001));
+  parameters.push_back(log(0.1));
+  cout << "Likelihood of actual parameters: " << mySIR.mle_sir(parameters) << endl;
+  cout << "SSE: " << mySIR.calculate_SSE(model,data) << endl;
+  parameters.push_back(log(500));
+  parameters.push_back(log(10));
+  model = mySIR.sse_sir_combined(parameters);
+  for(int i = 0;i<tempParams.size();++i){
+    tempParams[i] = exp(tempParams[i]);
+  }
+  printcon(tempParams);
+  plotGraph(model, data, 1);
+  */
+}
+
+
+
+/* ================================ FINAL LEAST SQUARES ============================= */
+
+
+void Handler::realtime_fit_multi(vector<double> &params, int version, double targetRSq){
   clock_t t1, t2; // To record the total run time
   vector<double> finalParams, finalParamsTemp;
   vector<int> detectionTimes;
@@ -50,16 +97,33 @@ void Handler::realtime_fit_multi(vector<double> &params, int version){
     SSE = optimiseEpidemics(epidemicCount, finalParams, temp, combinedResults, componentResults);
     RSquare = 1 - SSE/SStot(temp, 2);
     
+
+    // If fit is sufficiently good with k epidemics, try fitting with k-1 epidemics. If this fit
+    // is sufficient, use k-1 epidemics.
+    if(RSquare > targetRSq && epidemicCount > 0){
+      cout << "Considering removal" << endl;
+      SSE = optimiseEpidemics((epidemicCount-1),finalParamsTemp, temp, combinedResultsTemp, componentResultsTemp);
+      RSquareK1 = 1 - SSE/SStot(temp,2);
+      if(RSquareK1 > targetRSq){
+	cout << "Removing an epidemic" << endl;
+	RSquare = RSquareK1;
+	finalParams = finalParamsTemp;
+	combinedResults = combinedResultsTemp;
+	componentResults = componentResultsTemp;
+	epidemicCount--;
+      }
+    }
+
     // Check if a new epidemic has started. If so, and RSquare from current K epidemics 
     // insufficient, try fitting another. If this is a significantly better fit, permanently
     // add an extra epidemic.
     residuals = get_residuals(temp, tempModel);
-    if(check_epidemic(residuals) && RSquare < 0.95){
+    if(check_epidemic(residuals) && RSquare < targetRSq){
       cout << "Epidemic detected!" << endl;
       detectionTimes.push_back(i);
       SSE = optimiseEpidemics((epidemicCount+1),finalParamsTemp, temp, combinedResultsTemp, componentResultsTemp);
       RSquareK1 = 1 - SSE/SStot(temp,2);
-      if(RSquareK1 > 0.95){
+      if(RSquareK1 > targetRSq){
 	RSquare = RSquareK1;
 	finalParams = finalParamsTemp;
 	combinedResults = combinedResultsTemp;
@@ -114,7 +178,7 @@ double Handler::optimiseEpidemics(int epiCount, vector<double> &parameters, vect
   }
 
   // If there are epidemics to be fitted, perform 40 random fits and keep best fitting model
-  for(int index=0;index<40;index++){
+  for(int index=0;index<20;index++){
     cout << ".";
     //cout << "Optimise " << index << endl;
     // Clear the temporary seed parameters and seed rand
@@ -249,6 +313,15 @@ void Handler::print_vector(vector< vector<double> > my_data){
     cout << endl;  
   }
 }
+/* Function to print out a two dimensional vector of data */
+void Handler::print_vector(vector< vector<int> > my_data){
+  for(vector< vector<int> >::const_iterator i = my_data.begin(); i !=my_data.end(); ++i){
+    for(vector<int>::const_iterator j = i->begin(); j!=i->end();++j){
+      cout << *j << ' ';
+    }
+    cout << endl;  
+  }
+}
 
 
 
@@ -359,7 +432,7 @@ double Handler::SStot(vector<vector<double> > data, int column){
 */
 void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, vector<int> _detected){
   Gnuplot gp;   // Need instance of the Gnuplot class to pipe commands to gnuplot
-  string name = "graphs/output"; // The save location and general name of the graph to be saved
+  string name = "graphs1/output"; // The save location and general name of the graph to be saved
   string _index = to_string(index);
   string label, xlab;
 
@@ -371,10 +444,11 @@ void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vect
   gp << "set output '" << name << "'\n";  // Set output to the specified file name
   gp << "set termoption dash\n"; // Allow dashes
 
-  // Add lines for detection times
-  for(unsigned int i =0;i<_detected.size();++i){
+  // OFF
+  // Add lines for detection times 
+  /*for(unsigned int i =0;i<_detected.size();++i){
     gp << "set arrow from " << _detected[i] << ",0 to " << _detected[i] << "," << 500 << " nohead lc rgb 'red'\n";
-  } 
+    } */
 
   // Firstly, plot the actual data (3rd column)
   gp << "plot '-' using 1:3 with linespoints lt 19 title 'Data'";

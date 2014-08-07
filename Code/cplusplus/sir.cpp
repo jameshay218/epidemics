@@ -89,6 +89,25 @@ void SIR::Solve_Eq_total(vector<vector<double> >& _results){
   while(t<tmax);
 }
 
+/* Solves the ODEs for the current SIR parameters and saves these to _results. Difference
+   to above is that this is carried out for the entire data range (tmax) */
+void SIR::Solve_Eq_total2(vector<vector<int> >& _results){
+  t=0;
+  int i=0;
+  do{
+    Runge_Kutta();
+    _results[i][0] = (int)t + int(t0);
+    _results[i][1] = (int)S;
+    _results[i][2] = (int)I;
+    _results[i][3] = (int)R;
+    t+=step;
+    i++;
+  }
+  while(t<tmax);
+}
+
+
+
 
 /* Calculates the overall SSE from the current data set given a vector of parameters */
 double SIR::sse_sir_multi(vector<double> parameters){
@@ -112,6 +131,9 @@ double SIR::sse_sir_multi(vector<double> parameters){
     t0 = exp(parameters[3+(4*k)]);
     I = 1.0;
     R = 0.0;
+    if(!param_check()){
+      return(99999999999.9);
+    }
     Solve_Eq_t0(tempData);
     totalData = combine_vectors(totalData, tempData);
   }
@@ -131,8 +153,7 @@ vector<vector<double> > SIR::sse_sir_combined(vector<double> parameters){
     tempData[i][0] = i;
   }
   totalData = tempData;
-  
-  for(unsigned int k = 0; k<(parameters.size()/4);++k){
+   for(unsigned int k = 0; k<(parameters.size()/4);++k){
     beta = exp(parameters[4*k]);
     gamma = exp(parameters[1+(4*k)]);
     S = exp(parameters[2+(4*k)]);
@@ -141,8 +162,31 @@ vector<vector<double> > SIR::sse_sir_combined(vector<double> parameters){
     R = 0.0;
     Solve_Eq_total(tempData);
     totalData = combine_vectors(totalData, tempData);
-  }
+   }
+ 
   return(totalData);
+}
+
+/* Returns a 2 dimensional integer vector of combined model results from the passed parameters */
+vector<vector<int> > SIR::combined_model(vector<double> parameters){
+  vector<vector<int> > tempData;
+  vector<vector<int> > totalData;
+  tempData.resize(tmax);
+  for(unsigned int i=0;i<tmax;++i){
+    tempData[i].resize(4);
+    fill(tempData[i].begin(),tempData[i].end(),0.0);
+    tempData[i][0] = i;
+  }
+  totalData = tempData;
+  
+  beta = exp(parameters[0]);
+  gamma = exp(parameters[1]);
+  S = exp(parameters[2]);
+  t0 = exp(parameters[3]);
+  I = 1.0;
+  R = 0.0;
+  Solve_Eq_total2(tempData);
+  return(tempData);
 }
 
 /* As above, calculates a set of ODEs for each set of 4 parameters passed, but returns a vector of
@@ -285,6 +329,57 @@ bool SIR::param_check(){
   }
   return true;
 }
+
+/* ============================== MLE ================================== */
+
+double SIR::mle_sir(vector<double> parameters) {
+  vector<vector<double> > tempData;
+  vector<vector<double> > totalData;
+  tempData.resize(current_data.size());
+
+  // Create a vector with the appropriate first column (ie. time values)
+  for(unsigned int i=0;i<current_data.size();++i){
+    tempData[i].resize(4);
+    fill(tempData[i].begin(),tempData[i].end(),0.0);
+    tempData[i][0] = i;
+  }
+  totalData = tempData;
+  
+  // For each set of 4 parameters in the passed vector, solve a set of ODEs and save this result
+  beta = exp(parameters[0]);
+  gamma = exp(parameters[1]);
+  S = 500;
+  t0 = 10;
+  I = 1.0;
+  R = 0.0;
+  Solve_Eq_t0(tempData);
+  totalData = combine_vectors(totalData, tempData);
+  
+  // Calculate the overall SSE between the combined model and current data
+  double mle = dpois(current_data,totalData);
+  return(mle);
+}
+
+
+
+
+double SIR::dpois(vector<vector<double> > model, vector<vector<double> > data){
+  double logLikelihood;
+  int N = data.size();
+  logLikelihood = 0.0;
+  for(int i=0;i<N;++i){
+    if(model[i][2] == 0 && data[i][2] == 0){
+      logLikelihood -= 1;
+    }
+    else{
+      logLikelihood -= gsl_ran_poisson_pdf(model[i][2], data[i][2]);
+    }
+  }
+  return(logLikelihood);
+}
+
+
+
 
 
 

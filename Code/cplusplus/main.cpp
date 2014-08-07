@@ -79,8 +79,9 @@ int main() {
       cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
       cout << "--------------------------------------------------------------------" << endl;
       dataHandler.import_data(file);
-      dataHandler.realtime_fit_multi(finalParams, 2);
+      //dataHandler.realtime_fit_multi(finalParams, 2, 0.95);
       //dataHandler.test_detect(finalResults,finalParams);
+      dataHandler.likelihood_test(finalParams);
       break;
     }
 

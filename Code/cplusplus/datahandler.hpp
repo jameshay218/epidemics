@@ -30,9 +30,12 @@ public:
   Handler();
   ~Handler();
  
-  void realtime_fit_multi(vector<double> &params, int version);
+
+  void likelihood_test(vector<double> &params);
+  void realtime_fit_multi(vector<double> &params, int version, double targetRSp);
   bool check_epidemic(vector<vector<double> > residuals);
   double optimiseEpidemics(int epiCount, vector<double> &parameters, vector<vector<double> > data, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults);
+
   // Data handling fucntions
   vector<vector<double> > return_data(){
     return(current_data);
@@ -40,7 +43,7 @@ public:
   vector<double> concatenate_vectors(vector<double> a, vector<double> b);
   double import_data(const char* file);
   void print_vector(vector< vector<double> > my_data);
-
+  void print_vector(vector< vector<int> > my_data);
   // Maths functions
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);

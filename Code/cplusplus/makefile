@@ -1,8 +1,8 @@
-CXXFLAGS = -Wall -g -std=c++11
+CXXFLAGS = -Wall -g -std=c++11  -fexceptions
 CXX = g++
 
 main: main.o sir.o datahandler.o
-	$(CXX) $(CXXFLAGS) main.o sir.o datahandler.o -o main -lboost_system -lboost_iostreams -lboost_filesystem
+	$(CXX) $(CXXFLAGS) main.o sir.o datahandler.o -o main -lboost_system -lboost_iostreams -lboost_filesystem -lgsl -lgslcblas -lm
 
 main.o: main.cpp sir.hpp datahandler.hpp simplex.hpp
 	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
