@@ -13,7 +13,8 @@ Handler::~Handler(){
 
 void Handler::likelihood_test(vector<double> &params){
   vector<double> parameters, tempParams;
-  vector<vector<int> > data, model;
+  vector<vector<double> > data, model;
+
   SIR mySIR(double(current_data.size()), current_data);
   Simplex simplex;
   parameters.push_back(log(0.001));
@@ -21,37 +22,74 @@ void Handler::likelihood_test(vector<double> &params){
   parameters.push_back(log(500));
   parameters.push_back(log(10));
   
-  data = mySIR.combined_model(parameters);
+  parameters.push_back(log(0.001));
+  parameters.push_back(log(0.05));
+  parameters.push_back(log(650));
+  parameters.push_back(log(50.0));
+  
+  parameters.push_back(log(0.002));
+  parameters.push_back(log(0.075));
+  parameters.push_back(log(450));
+  parameters.push_back(log(75.0));
+  
+
+  data = mySIR.ode_solve_combined(parameters);
   print_vector(data);
+  
   //long temp = 222;
   //mySIR.factorial(temp);
-  /*mySIR.update_data(data);
+  mySIR.update_data(data);
 
   parameters.clear();
-  parameters.push_back(log(0.0005));
-  parameters.push_back(log(0.11));
+  parameters.push_back(log(0.002));
+  parameters.push_back(log(0.08));
+  parameters.push_back(log(550));
+  parameters.push_back(log(10));
+
+  parameters.push_back(log(0.0008));
+  parameters.push_back(log(0.06));
+  parameters.push_back(log(690));
+  parameters.push_back(log(54));
+  parameters.push_back(log(0.002));
+  parameters.push_back(log(0.075));
+  parameters.push_back(log(450));
+  parameters.push_back(log(75.0));
+  
+
 
 
   cout << "Test: " << mySIR.mle_sir(parameters) << endl;
 
+  
   tempParams = simplex.neldermead(&SIR::mle_sir, mySIR,  parameters);
   cout << "Final log likelihood: " << mySIR.mle_sir(tempParams) << endl;
-  tempParams.push_back(log(500));
-  tempParams.push_back(log(10));
+  
   parameters.clear();
   parameters.push_back(log(0.001));
   parameters.push_back(log(0.1));
-  cout << "Likelihood of actual parameters: " << mySIR.mle_sir(parameters) << endl;
-  cout << "SSE: " << mySIR.calculate_SSE(model,data) << endl;
   parameters.push_back(log(500));
   parameters.push_back(log(10));
-  model = mySIR.sse_sir_combined(parameters);
+  parameters.push_back(log(0.001));
+  parameters.push_back(log(0.05));
+  parameters.push_back(log(650));
+  parameters.push_back(log(50.0));
+  parameters.push_back(log(0.002));
+  parameters.push_back(log(0.075));
+  parameters.push_back(log(450));
+  parameters.push_back(log(75.0));
+  
+
+
+  cout << "Likelihood of actual parameters: " << mySIR.mle_sir(parameters) << endl;
+  //cout << "SSE: " << mySIR.calculate_SSE(model,data) << endl;
+
+  model = mySIR.ode_solve_combined(tempParams);
   for(int i = 0;i<tempParams.size();++i){
     tempParams[i] = exp(tempParams[i]);
   }
   printcon(tempParams);
   plotGraph(model, data, 1);
-  */
+    
 }
 
 
@@ -191,9 +229,9 @@ double Handler::optimiseEpidemics(int epiCount, vector<double> &parameters, vect
     }
     
     // Get the optimised parameters from nelder mead algorithm
-    tempParams = simplex.neldermead(&SIR::sse_sir_multi, mySIR,  seedParams);
+    tempParams = simplex.neldermead(&SIR::overall_sse, mySIR,  seedParams);
     // Store the SSE value for this
-    tempSSE = mySIR.sse_sir_multi(tempParams);
+    tempSSE = mySIR.overall_sse(tempParams);
 	
     // If this SSE value is better than the previous, store it and the
     // corresponding parameters
@@ -205,9 +243,9 @@ double Handler::optimiseEpidemics(int epiCount, vector<double> &parameters, vect
 
   // Get the combined values from these parameters, as well as a vector of 
   // each sub-epidemic
-  results = mySIR.sse_sir_combined(parameters); 
+  results = mySIR.ode_solve_combined(parameters); 
   currentModel = base_model(data);
-  tempAll = mySIR.sse_sir_components(parameters);
+  tempAll = mySIR.ode_solve_separate(parameters);
   allResults.clear();
   allResults.push_back(currentModel);
   for(unsigned int x = 0;x<tempAll.size();++x){
@@ -566,7 +604,7 @@ void Handler::realtime_fit(vector<vector<double> > &results, vector<double> &par
     }
     
     cout << "Final SSE was: " << SSE << endl;
-    results = mySIR.sse_sir_single(params);  
+    results = mySIR.solve_single(params);  
     RSquare = 1 - SSE/SStot(temp, 2);
     cout << "Final RSquare: " << RSquare << endl;
     for(unsigned int j=0;j<params.size();++j){
@@ -618,14 +656,14 @@ void Handler::test_detect(vector<vector<double> > &results, vector<double> &para
   par.push_back(log(600));
   par.push_back(log(50));
 
-  myData = mySIR.sse_sir_combined(par);
+  myData = mySIR.ode_solve_combined(par);
 
   par1.push_back(log(0.001));
   par1.push_back(log(0.1));
   par1.push_back(log(500));
   par1.push_back(log(10));
 
-  currentData = mySIR.sse_sir_combined(par1);
+  currentData = mySIR.ode_solve_combined(par1);
 
   temp1.push_back(currentData);
   plotGraphMulti(temp1, myData, myData, 1, par, 1.0, detectionTimes);
