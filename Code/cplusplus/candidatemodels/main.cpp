@@ -16,6 +16,7 @@ using namespace std;
 #include "datahandler.hpp"
 #include "epidemic.hpp"
 #include "sir.hpp"
+#include "seir.hpp"
 const int STEP_SIZE = 0.1;
 
 
@@ -80,6 +81,7 @@ int main() {
       cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
       cout << "--------------------------------------------------------------------" << endl;
       dataHandler.import_data(file);
+      //dataHandler.overall_test(0.95);
       dataHandler.realtime_fit_multi(0.95);
       //dataHandler.test_detect(finalResults,finalParams);
       //dataHandler.likelihood_test(finalParams);

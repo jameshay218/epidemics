@@ -24,16 +24,14 @@ double SIR::mle_sir(vector<double> parameters) {
   pars = parameters;
   reset_models(current_data.size());
   // For each set of 4 parameters in the passed vector, solve a set of ODEs and save this result
-  for(unsigned int k = 0; k<(parameters.size()/4);++k){
-    beta = exp(parameters[4*k]);
-    gamma = exp(parameters[1+(4*k)]);
-    populations[0] = exp(parameters[2+(4*k)]);
-    t0 = exp(parameters[3+(4*k)]);
-    populations[1] = 1.0;
-    populations[2] = 0.0;
-    Solve_Eq_t0(temp_model);
-    total_model = combine_vectors(total_model, temp_model);
-  }
+  beta = exp(parameters[0]);
+  gamma = exp(parameters[1]);
+  populations[0] = exp(parameters[2]);
+  t0 = exp(parameters[3]);
+  populations[1] = 1.0;
+  populations[2] = 0.0;
+  Solve_Eq_t0(temp_model, 1);
+  total_model = combine_vectors(total_model, temp_model);
   // Calculate the overall SSE between the combined model and current data
   double mle = dpois(total_model,current_data);
   return(mle);
@@ -42,49 +40,8 @@ double SIR::mle_sir(vector<double> parameters) {
 
 /* ================================== SSE FITTING PROCEDURE ================================= */
 
-/* Calculates the overall SSE from the current data set given a vector of parameters */
-double SIR::overall_sse(vector<double> parameters){
-  pars = parameters;
-  reset_models(current_data.size());
-  
-  // For each set of 4 parameters in the passed vector, solve a set of ODEs and save this result
-  for(unsigned int k = 0; k<(parameters.size()/4);++k){
-    beta = exp(parameters[4*k]);
-    gamma = exp(parameters[1+(4*k)]);
-    populations[0] = exp(parameters[2+(4*k)]);
-    t0 = exp(parameters[3+(4*k)]);
-    populations[1] = 1.0;
-    populations[2] = 0.0;
-    if(!param_check()){
-      return(99999999999.9);
-    }
-    Solve_Eq_t0(temp_model);
-    total_model = combine_vectors(total_model, temp_model);
-  }
-  // Calculate the overall SSE between the combined model and current data
-  double sse = calculate_SSE(current_data,total_model, 2);
-  return(sse);
-}
-
 /* Calculates a set of ODEs for each set of 4 parameters passed and returns the combined model */
 vector<vector<double> > SIR::ode_solve_combined(vector<double> parameters){
-  pars = parameters;
-  reset_models(tmax);
-  
-  for(unsigned int k = 0; k<(parameters.size()/4);++k){
-    beta = exp(parameters[4*k]);
-    gamma = exp(parameters[1+(4*k)]);
-    populations[0] = exp(parameters[2+(4*k)]);
-    t0 = exp(parameters[3+(4*k)]);
-    populations[1] = 1.0;
-    populations[2] = 0.0;
-    Solve_Eq_total(temp_model);
-    total_model = combine_vectors(total_model, temp_model);
-  }
-  return(total_model);
-}
-
-vector<vector<double> > SIR::ode_solve(vector<double> parameters){
   pars = parameters;
   reset_models(tmax);
   
@@ -94,44 +51,38 @@ vector<vector<double> > SIR::ode_solve(vector<double> parameters){
   t0 = exp(parameters[3]);
   populations[1] = 1.0;
   populations[2] = 0.0;
-  Solve_Eq_total(temp_model);
+  Solve_Eq_total(temp_model, 1);
+  total_model = combine_vectors(total_model, temp_model);
+  
+  return(total_model);
+}
+
+vector<vector<double> > SIR::ode_solve(vector<double> parameters){
+  pars = parameters;
+  reset_models(current_data.size());
+  
+  beta = exp(parameters[0]);
+  gamma = exp(parameters[1]);
+  populations[0] = exp(parameters[2]);
+  t0 = exp(parameters[3]);
+  populations[1] = 1.0;
+  populations[2] = 0.0;
+  Solve_Eq_t0(temp_model, 1);
   return(temp_model);
 }
 
 
-
-/* As above, calculates a set of ODEs for each set of 4 parameters passed, but returns a vector of
-   each sub epidemic */
-vector<vector<vector<double> > > SIR::ode_solve_separate(vector<double> parameters){
-  pars = parameters;
-  reset_models(tmax);
-  vector<vector<vector<double> > > models;  
-
-  for(unsigned int k = 0; k<(parameters.size()/4);++k){
-    beta = exp(parameters[4*k]);
-    gamma = exp(parameters[1+(4*k)]);
-    populations[0] = exp(parameters[2+(4*k)]);
-    t0 = exp(parameters[3+(4*k)]);
-    populations[1] = 1.0;
-    populations[2] = 0.0;
-    Solve_Eq_total(temp_model);
-    models.push_back(temp_model);
-  }
-  return(models);
-}
-
-
 bool SIR::param_check(){
-  if(beta < 0.0005 || beta > 0.05){
+  if(beta < 0.00001 || beta > gamma){
     return false;
   }
   if(gamma < 0.001 || gamma > 0.5){
     return false;
   }
-  if(populations[0] < 100 || populations[0] > 2000){
+  if(populations[0] < 50 || populations[0] > 5000){
     return false;
   }
-  if(t0 < 1 || t0 > 100){
+  if(t0 < 0 || t0 > 100){
     return false;
   }
   return true;

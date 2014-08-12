@@ -87,6 +87,7 @@ vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of objec
 			      vector<vector<D> > x =  vector<vector<D> >(),
 			      //x: The Simplex
 			      int iterations=5E3){
+  
   int N=init.size(); 
   //space dimension
   const double a=1.0, b=1.0, g=0.5, h=0.5;   //coefficients

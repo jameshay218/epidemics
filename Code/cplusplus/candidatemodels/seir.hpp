@@ -7,7 +7,7 @@ using namespace std;
 
 class SEIR: public Epidemic{
 protected:
-  double beta, gamma;
+  double beta, gamma, alpha;
   
 public:
   // Housekeeping functions
@@ -16,30 +16,37 @@ public:
     beta = 0.001;
     alpha = 0.01;
     gamma = 0.1;
+    infectedIndex = 3;
+
+    pars.clear();
+    pars.push_back(beta);
+    pars.push_back(alpha);
+    pars.push_back(gamma);
     
     // Initial population sizes
     populations[0] = 500.0;
+    pars.push_back(populations[0]);
     populations[1] = 0.0;
     populations[2] = 1.0;
     populations[3] = 0.0;
+    pars.push_back(1);
   };
   ~SEIR();    
-  bool param_check();
+  virtual bool param_check();
 
 
 
   /* NORMAL ODE SOLVER */
-  void Diff(vector<double> Pop);
+  virtual void Diff(vector<double> Pop);
 
   /* MLE SOLVER */
-  double mle_sir(vector<double> parameters); 
+  virtual double mle_sir(vector<double> parameters); 
   
   
   /* SSE SOLVER */
-  double overall_sse(vector<double> parameters);
-  vector<vector<double> > combined_model(vector<double> parameters);
-  vector<vector<double> > ode_solve_combined(vector<double> parameters);
-  vector<vector<vector<double> > > ode_solve_separate(vector<double> parameters);
+  virtual vector<vector<double> > ode_solve(vector<double> parameters);
+  virtual vector<vector<double> > ode_solve_combined(vector<double> parameters);
+
   
 };
 #endif

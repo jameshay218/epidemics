@@ -40,8 +40,8 @@ public:
   /* NORMAL ODE SOLVER */
   virtual void Diff(vector<double> Pop) = 0;
   void Runge_Kutta();
-  void Solve_Eq_t0(vector<vector<double> >& _results);
-  void Solve_Eq_total(vector<vector<double> >& _results);
+  void Solve_Eq_t0(vector<vector<double> >& _results, int index);
+  void Solve_Eq_total(vector<vector<double> >& _results, int index);
   
 
   /* MLE SOLVER */
@@ -51,10 +51,7 @@ public:
   
 
   /* SSE SOLVER */
-  virtual double overall_sse(vector<double> parameters) = 0;
   virtual vector<vector<double> > ode_solve(vector<double> parameters) = 0;
   virtual vector<vector<double> > ode_solve_combined(vector<double> parameters) = 0; 
-  virtual vector<vector<vector<double> > > ode_solve_separate(vector<double> parameters) = 0;
-  static double calculate_SSE(vector<vector<double> > data1, vector<vector<double> > data2, int index);
 };
 #endif

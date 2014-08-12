@@ -29,24 +29,22 @@ public:
     pars.push_back(1);
   };
   ~SIR();    
-  bool param_check();
+  virtual bool param_check();
 
 
 
   /* NORMAL ODE SOLVER */
-  void Diff(vector<double> Pop);
+  virtual void Diff(vector<double> Pop);
  
 
   /* MLE SOLVER */
-  double mle_sir(vector<double> parameters); 
+  virtual double mle_sir(vector<double> parameters); 
   
   
   /* SSE SOLVER */
-  double overall_sse(vector<double> parameters);
-  vector<vector<double> > ode_solve(vector<double> parameters);
-  vector<vector<double> > combined_model(vector<double> parameters);
-  vector<vector<double> > ode_solve_combined(vector<double> parameters);
-  vector<vector<vector<double> > > ode_solve_separate(vector<double> parameters);
+  //double overall_sse(vector<double> parameters);
+  virtual vector<vector<double> > ode_solve(vector<double> parameters);
+  virtual vector<vector<double> > ode_solve_combined(vector<double> parameters);
   
 };
 #endif
