@@ -81,7 +81,7 @@ void Handler::realtime_fit_multi(double targetRSq){
   baseModel = current_model;
 
   // For each time point in the current data set, carry out the fitting procedure
-  for(unsigned int i = 60;i<current_data.size();++i){
+  for(unsigned int i = 64;i<current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
@@ -471,17 +471,17 @@ vector<double> Handler::rand_params(EpiType _type){
   double beta,gamma,s0,t0,alpha;
   
   setprecision(9);
-  /*beta = (rand()%100+1)/10000.0;
+  beta = (rand()%100+1)/10000.0;
   alpha = (rand()%100+1)/10000.0;
   gamma = (rand()%200+beta)/1000.0;
   s0 = rand()%1000+100;
   t0 = rand()%80+1;
-  */
-  beta = 0.001;
+  
+  /*beta = 0.001;
   alpha = 0.001;
   gamma = 0.1;
   s0 = 500;
-  t0 = 15;
+  t0 = 15;*/
   switch(_type){
   case sir:
     params.push_back(log(beta));
@@ -648,6 +648,7 @@ void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vect
   string name = "graphs/output"; // The save location and general name of the graph to be saved
   string _index = to_string(index);
   string label, xlab;
+  int j = 0;
 
   xlab = "RSquare: " + to_string(_RSquare);  // Xlabel is the RSquare value
   name = name + _index + ".jpeg";  // Graph name
@@ -668,11 +669,11 @@ void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vect
   gp << ", '-' using 1:2 with lines lt 0 lc " << 0 << " title '" << label << "'";
  
 
-  for(unsigned int i = 0;i<epidemics.size();++i){
+  for(int f = 0;f<(int)epidemics.size();++f){
     // Create the label depending on the type of epidemic
-    label = "Sub-Epidemic " + to_string(i+1);
-    label += create_label(epidemics[i]);
-    gp << ", '-' using 1:2 with lines lt 0 lc " << i << " title '" << label << "'";
+    label = "Sub-Epidemic " + to_string(f+1);
+    label += create_label(epidemics[f], parameters, j);
+    gp << ", '-' using 1:2 with lines lt 0 lc " << f << " title '" << label << "'";
   }
 
 
@@ -686,18 +687,20 @@ void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vect
   }
 }
 
-string Handler::create_label(Epidemic* epi){
+string Handler::create_label(Epidemic* epi, vector<double> par1, int& i){
   string toReturn;
-  vector<double> par1 = epi->return_parameters();
   switch(epi->return_type()){
   case sir:
-    toReturn = " (SIR): beta = " + to_string(exp(par1[0])) + "; gamma = " + to_string(exp(par1[1])) + "; S0 = " + to_string(exp(par1[2])) + "; t0 = " + to_string(exp(par1[3]));
+    toReturn = " (SIR): beta = " + to_string(par1[i]) + "; gamma = " + to_string(par1[i+1]) + "; S0 = " + to_string(par1[i+2]) + "; t0 = " + to_string(par1[i+3]);
+    i = i+3;
     break;
   case seir:
-    toReturn = " (SEIR): beta = " + to_string(exp(par1[0])) + "; alpha = " + to_string(exp(par1[1])) +"; gamma = " + to_string(exp(par1[2])) + "; S0 = " + to_string(exp(par1[3])) + "; t0 = " + to_string(exp(par1[4]));
+    toReturn = " (SEIR): beta = " + to_string(par1[i]) + "; alpha = " + to_string(par1[i+1]) +"; gamma = " + to_string(par1[i+2]) + "; S0 = " + to_string(par1[i+3]) + "; t0 = " + to_string(par1[i+4]);
+    i = i+4;
     break;
   case spike:
-    toReturn = " (EXP): gamma = " + to_string(exp(par1[0])) + "; I0 = " + to_string(exp(par1[1])) + "; t0 = " + to_string(exp(par1[2]));
+    toReturn = " (EXP): gamma = " + to_string(par1[i]) + "; I0 = " + to_string(par1[i+1]) + "; t0 = " + to_string(par1[i+2]);
+    i = i+2;
     break;
   default:
   break;

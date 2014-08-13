@@ -69,7 +69,7 @@ public:
   // Graph plotting functions
   void plotGraph(vector<vector<double> > finalResults, vector<vector<double> > data, int index);
   void plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, int column);
-  string create_label(Epidemic* epi);
+  string create_label(Epidemic* epi, vector<double> parameters, int& i);
   // Old functions
   void testAddition(vector<vector<double> > data1, vector<vector<double> > data2, double offset);
   void test_detect(vector<vector<double> > &results, vector<double> &params);
