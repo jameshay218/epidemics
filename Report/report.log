@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.10.23)  13 AUG 2014 20:23
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.10.23)  14 AUG 2014 21:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -278,38 +278,127 @@ Package: enumitem 2011/09/28 v3.5.2 Customized lists
 \enit@toks=\toks28
 \enit@inbox=\box28
 \enitdp@description=\count107
-) (./report.aux
+)
+(/usr/share/texlive/texmf-dist/tex/latex/algorithms/algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+(/usr/share/texlive/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count108
+\float@exts=\toks29
+\float@box=\box29
+\@float@everytoks=\toks30
+\@floatcapt=\box30
+)
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks31
+\c@algorithm=\count109
+)
+(/usr/share/texlive/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
+Package: algpseudocode 
+
+(/usr/share/texlive/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
+Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
+
+Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
+\c@ALG@line=\count110
+\c@ALG@rem=\count111
+\c@ALG@nested=\count112
+\ALG@tlm=\skip55
+\ALG@thistlm=\skip56
+\c@ALG@Lnr=\count113
+\c@ALG@blocknr=\count114
+\c@ALG@storecount=\count115
+\c@ALG@tmpcounter=\count116
+\ALG@tmplength=\skip57
+)
+Document Style - pseudocode environments for use with the `algorithmicx' style
+) (/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2012/02/19 v3.2f Customizing captions (AR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2012/01/12 v1.4b caption3 kernel (AR)
+\captionmargin=\dimen138
+\captionmargin@=\dimen139
+\captionwidth=\dimen140
+\caption@indent=\dimen141
+\caption@parindent=\dimen142
+\caption@hangindent=\dimen143
+)
+\c@ContinuedFloat=\count117
+Package caption Info: float package is loaded.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count118
+\lst@gtempboxa=\box31
+\lst@token=\toks32
+\lst@length=\count119
+\lst@currlwidth=\dimen144
+\lst@column=\count120
+\lst@pos=\count121
+\lst@lostspace=\dimen145
+\lst@width=\dimen146
+\lst@newlines=\count122
+\lst@lineno=\count123
+\lst@maxwidth=\dimen147
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
+\c@lstnumber=\count124
+\lst@skipnumbers=\count125
+\lst@framebox=\box32
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2007/02/22 1.4 listings configuration
+))
+Package: listings 2007/02/22 1.4 (Carsten Heinz)
+ (./report.aux
 
 LaTeX Warning: Label `sir' multiply defined.
+
+
+LaTeX Warning: Label `sir' multiply defined.
+
+
+LaTeX Warning: Label `sir' multiply defined.
+
+
+LaTeX Warning: Label `sir' multiply defined.
+
+
+LaTeX Warning: Label `singer' multiply defined.
 
 )
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
  (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count108
-\scratchdimen=\dimen138
-\scratchbox=\box29
-\nofMPsegments=\count109
-\nofMParguments=\count110
-\everyMPshowfont=\toks29
-\MPscratchCnt=\count111
-\MPscratchDim=\dimen139
-\MPnumerator=\count112
-\makeMPintoPDFobject=\count113
-\everyMPtoPDFconversion=\toks30
+\scratchcounter=\count126
+\scratchdimen=\dimen148
+\scratchbox=\box33
+\nofMPsegments=\count127
+\nofMParguments=\count128
+\everyMPshowfont=\toks33
+\MPscratchCnt=\count129
+\MPscratchDim=\dimen149
+\MPnumerator=\count130
+\makeMPintoPDFobject=\count131
+\everyMPtoPDFconversion=\toks34
 )
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -345,11 +434,15 @@ LaTeX Font Info:    ... okay on input line 32.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 48.
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: listings package is loaded.
+Package caption Info: End \AtBeginDocument code.
+\c@lstlisting=\count132
+LaTeX Font Info:    Try loading font information for U+msa on input line 60.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 48.
+LaTeX Font Info:    Try loading font information for U+msb on input line 60.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
@@ -357,7 +450,7 @@ File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 <ImperialCrest.jpg, id=1, 429.605pt x 429.605pt>
 File: ImperialCrest.jpg Graphic file (type jpg)
  <use ImperialCrest.jpg>
-Package pdftex.def Info: ImperialCrest.jpg used on input line 56.
+Package pdftex.def Info: ImperialCrest.jpg used on input line 68.
 (pdftex.def)             Requested size: 142.26378pt x 142.26172pt.
 
 [1
@@ -367,10 +460,10 @@ Package pdftex.def Info: ImperialCrest.jpg used on input line 56.
 File: marily2014.png Graphic file (type png)
 
 <use marily2014.png>
-Package pdftex.def Info: marily2014.png used on input line 158.
+Package pdftex.def Info: marily2014.png used on input line 170.
 (pdftex.def)             Requested size: 398.33858pt x 124.93701pt.
  [4 <./marily2014.png>] [5]
-Overfull \hbox (1.39687pt too wide) in paragraph at lines 256--257
+Overfull \hbox (1.39687pt too wide) in paragraph at lines 268--269
 []\OT1/cmr/m/n/10.95 The most ba-sic form of the model prosed by Ker-mack and M
 cK-endrick's ODEs is the Susceptible-
  []
@@ -378,32 +471,142 @@ cK-endrick's ODEs is the Susceptible-
 [6] <Rplot.png, id=38, 602.25pt x 602.25pt>
 File: Rplot.png Graphic file (type png)
  <use Rplot.png>
-Package pdftex.def Info: Rplot.png used on input line 272.
+Package pdftex.def Info: Rplot.png used on input line 284.
 (pdftex.def)             Requested size: 341.43306pt x 341.44815pt.
  [7 <./Rplot.png (PNG copy)>] [8]
-Underfull \hbox (badness 10000) in paragraph at lines 312--313
+Underfull \hbox (badness 10000) in paragraph at lines 324--340
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 312--313
+Underfull \hbox (badness 10000) in paragraph at lines 324--340
 
  []
 
-[9] [10] [11] [12] [13]
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 419.
+[9] <sse.png, id=50, 501.875pt x 599.23875pt>
+File: sse.png Graphic file (type png)
+ <use sse.png>
+Package pdftex.def Info: sse.png used on input line 357.
+(pdftex.def)             Requested size: 284.52756pt x 339.7409pt.
 
+<logmle.png, id=51, 859.21pt x 658.46pt>
+File: logmle.png Graphic file (type png)
+ <use logmle.png>
+Package pdftex.def Info: logmle.png used on input line 366.
+(pdftex.def)             Requested size: 398.33858pt x 305.26643pt.
+
+<mle.png, id=52, 859.21pt x 658.46pt>
+File: mle.png Graphic file (type png)
+ <use mle.png>
+Package pdftex.def Info: mle.png used on input line 369.
+(pdftex.def)             Requested size: 398.33858pt x 305.26643pt.
+ [10 <./sse.png (PNG copy)>] [11 <./logmle.png>] [12 <./mle.png>]
+<statsdist.png, id=66, 3767.82657pt x 533.74406pt>
+File: statsdist.png Graphic file (type png)
+ <use statsdist.png>
+Package pdftex.def Info: statsdist.png used on input line 382.
+(pdftex.def)             Requested size: 455.24408pt x 64.48631pt.
+
+Overfull \hbox (2.27618pt too wide) in paragraph at lines 382--383
+ [][] 
+ []
+
+[13 <./statsdist.png>] [14] <hatfield.png, id=74, 734.745pt x 554.07pt>
+File: hatfield.png Graphic file (type png)
+
+<use hatfield.png>
+Package pdftex.def Info: hatfield.png used on input line 399.
+(pdftex.def)             Requested size: 341.43306pt x 257.47925pt.
+ <facegroup.png, id=75, 727.0362pt x 546.3612pt>
+File: facegroup.png Graphic file (type png)
+
+<use facegroup.png>
+Package pdftex.def Info: facegroup.png used on input line 406.
+(pdftex.def)             Requested size: 341.43306pt x 256.58138pt.
+ [15 <./hatfield.png> <./facegroup.png>] [16]
+Underfull \hbox (badness 10000) in paragraph at lines 448--460
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 448--460
+
+ []
+
+[17] [18]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 572.
+
+ (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 572.
+ [19]
+[20] [21] <simplesir.png, id=101, 602.25pt x 621.32124pt>
+File: simplesir.png Graphic file (type png)
+ <use simplesir.png>
+Package pdftex.def Info: simplesir.png used on input line 789.
+(pdftex.def)             Requested size: 426.79134pt x 440.32584pt.
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2004/09/05 1.3 listings language file
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang2.sty
+File: lstlang2.sty 2004/09/05 1.3 listings language file
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang3.sty
+File: lstlang3.sty 2004/09/05 1.3 listings language file
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 813.
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 814.
+
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/omlcmr.fd
+File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10.95> not available
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 814.
+LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 821.
+
+<Rplot01.png, id=102, 602.25pt x 621.32124pt>
+File: Rplot01.png Graphic file (type png)
+ <use Rplot01.png>
+Package pdftex.def Info: Rplot01.png used on input line 841.
+(pdftex.def)             Requested size: 426.79134pt x 440.32584pt.
+ [22] [23 <./simplesir.png (PNG copy)>] [24]
+Underfull \vbox (badness 3029) detected at line 953
+ []
+
+[25 <./Rplot01.png (PNG copy)>]
+<nelder.png, id=119, 478.03593pt x 306.39468pt>
+File: nelder.png Graphic file (type png)
+ <use nelder.png>
+Package pdftex.def Info: nelder.png used on input line 1026.
+(pdftex.def)             Requested size: 426.79134pt x 273.55064pt.
+ [26]
+Underfull \vbox (badness 10000) detected at line 1042
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 1042
+ []
+
+[27] [28 <./nelder.png>] [29] [30]
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 1065
+.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [14]
-Underfull \hbox (badness 10000) in paragraph at lines 468--469
+) [31]
+Underfull \hbox (badness 10000) in paragraph at lines 1114--1115
 []\OT1/cmr/m/n/10.95 Develing, M; Adamic, L; Tay-lor, S. De-bunk-ing Prince-ton
 . URL:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 470--471
+Underfull \hbox (badness 10000) in paragraph at lines 1116--1117
 []\OT1/cmr/m/n/10.95 Facegroup. How stuff spreads: How videos go vi-ral part I.
  URL:
  []
@@ -411,41 +614,47 @@ Underfull \hbox (badness 10000) in paragraph at lines 470--471
 Missing character: There is no â in font cmr10!
 Missing character: There is no € in font cmr10!
 Missing character: There is no “ in font cmr10!
-[15]
-Overfull \hbox (3.43353pt too wide) in paragraph at lines 502--503
+[32]
+Overfull \hbox (3.43353pt too wide) in paragraph at lines 1148--1149
 []\OT1/cmr/m/n/10.95 CDC Flu-View Web Por-tal. URL: http://gis.cdc.gov/grasp/fl
 uview/fluportaldashboard.html 
  []
 
-[16] (./report.aux)
+[33] (./report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 4021 strings out of 494966
- 56644 string characters out of 3178674
- 125000 words of memory out of 3000000
- 7139 multiletter control sequences out of 15000+200000
- 12824 words of font info for 47 fonts, out of 3000000 for 9000
+ 7688 strings out of 494966
+ 111219 string characters out of 3178674
+ 239595 words of memory out of 3000000
+ 10742 multiletter control sequences out of 15000+200000
+ 13789 words of font info for 50 fonts, out of 3000000 for 9000
  36 hyphenation exceptions out of 8191
- 42i,15n,24p,1385b,260s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 42i,16n,43p,1500b,2054s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/texmf-dist/font
-s/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type
-1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.p
-fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></u
-sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/sha
-re/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on report.pdf (17 pages, 375562 bytes).
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/font
+s/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/s
+hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/ty
+pe1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/urw/courier/ucrr8a.pfb>
+Output written on report.pdf (34 pages, 3115125 bytes).
 PDF statistics:
- 113 PDF objects out of 1000 (max. 8388607)
- 77 compressed objects within 1 object stream
+ 207 PDF objects out of 1000 (max. 8388607)
+ 132 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 61 words of extra memory for PDF output out of 10000 (max. 10000000)
 
