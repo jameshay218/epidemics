@@ -197,7 +197,7 @@ epidemic unfolds and more data points are obtained.
 The initial implementation of this framework is initially undetaken using the R
 statistics programming environment due to the availability of useful
 packages and functions. For example, the \emph{deSolve} for solving
-first-order ordinary diffierential equations (ODEs), the \emph{optim}
+first-order ordinary differential equations (ODEs), the \emph{optim}
 function for optimising a set of model parameters, and the
 \emph{bbmle} package for maximum likeliihood based fitting.
 
@@ -765,12 +765,7 @@ the issue of epidemic outbreak detection and model selection, which we
 will revisit in section SECTIONNNN!. We go on to use a maximum
 likelihood based approach which allows for the generation of
 confidence intervals. Finally, we reimplement the above approaches in
-C++ to provide a much faster implementation.
-
-\subsection{Parameter Optimisation}
-The ultimate aim of the optimisation procedure is to find the set of parameters for a set of
-ODEs that, when solved, best fit the given data. As discussed in
-section BACKGROUND, we 
+C++ to provide a much faster fitting framework.
 
 \subsection{Data Management}
 The data that we wish to characterise is the change in number of
@@ -781,7 +776,9 @@ have viewed a particular \emph{YouTube} video or `liked' a particular
 Figure XX. It is very easy to deal with data in \emph{R}, as the use
 of `data frames' allows for .csv files of epidemic data to be easily
 imported and manipulated. In C++, we also import data as .csv files,
-but as data must be stored in vectors, initial data formatting is more crucial.
+but as data must be stored in vectors, initial data formatting is more
+crucial. 
+
 
 \begin{center}
 \begin{figure}[ht!]
@@ -793,6 +790,43 @@ but as data must be stored in vectors, initial data formatting is more crucial.
 \end{figure}  
 \end{center}
 
+We use the results of solving ODEs with known parameters and
+independent runs of the \emph{GillespieSSA} algorithm to test the
+framework's ability to find the true model
+parameters. \emph{GillespieSSA} provides an easy to use, extensible
+means of generating simulated trajectories of finite population
+continuous-time models. Figure XX shows a basic implementation of the
+SIR model in R using \emph{GillespieSSA}.
+
+\begin{center}
+\begin{figure}[!]
+
+\begin{lstlisting}[language=R, style=customc]
+function(params, I0, time, i){
+    # Define parameters
+    parms <- c(beta=params[1],gamma=params[2])
+    
+    # Define system
+    x0 <- c(S=params[3], I=I0, R=0)  # Initial state vector
+    nu <- matrix(c(-1,0,1,-1,0,1),nrow=3,byrow=T) # State-change matrix
+    a  <- c("beta*S*I", "gamma*I")         # Propensity vector
+    tf <- time                             # Final time
+    simName <- "Kermack-McKendrick SIR"
+
+    # Run the simulations
+    nf <- layout(matrix(c(1,2,3,4),ncol=2, byrow=T))
+    
+    # Direct method
+    set.seed(i)
+    out <- ssa(x0,a,nu,parms,tf,method="ETL",tau=1, simName,verbose=FALSE)
+    return(out.data)
+}
+\end{lstlisting}
+\end{figure}
+\end{center}
+
+
+
 \subsection{Candidate Models}
 As we aim to find a model that best describes our data, the next
 consideration is the creation of data that best fits our epidemic data
@@ -803,12 +837,11 @@ and compare this to the epidemic data. When implementing the model fitting
 framework in \emph{R}, we utilise the \emph{ode} function from the
 \emph{deSolve} package to return a matrix of values calculated from a
 given set of parameters, a set of ODEs and a desired time frame. A
-simple \emph{R} implementation of the \emph{SIR} is shown in Figure
-XX.
+simple \emph{R} implementation of the \emph{SIR} is shown in Figure~\ref{fig:sirR}.
 
 \begin{center}
 \begin{figure}[ht!]
-
+\centering
 \begin{lstlisting}[language=R, style=customc]
 function(time, data, parameters) {
   S <- data[1]
@@ -825,14 +858,14 @@ function(time, data, parameters) {
   list(c(dS,dI,dR))
 }
 \end{lstlisting}
+\label{sirR}
 \end{figure}
 \end{center}
 
 With a model solving framework and a set of data that we wish to fit,
 one can begin to visualise how the model fitting process might take
 place. Even with completely unknown parameters, candidate models can
-be generating by choosing parameters that might fit the data. Figure
-XX depicts how using various model parameters can give different
+be generating by choosing parameters that might fit the data. Figure~\ref{fig:sircurves} depicts how using various model parameters can give different
 shaped curves. 
 
 \begin{center}
@@ -841,6 +874,7 @@ shaped curves.
 \includegraphics[width=15cm]{Rplot01.png}
 \caption{Depiction of how various candidate model parameters give
   varying levels of fit for a given dataset}
+\label{sircurves}
 \end{figure}  
 \end{center}
 
@@ -853,9 +887,9 @@ scratch' ODE solver using the Runge-Kutta method in an attempt to
 speed up the model fitting process. A theoretical introduction to ODE
 solving is provided in Box 4.  
 
-
+\newpage
 \begin{framed}
-{\begin{center}{\bf Box 4}\end{center}}
+{\begin{center}{\bf Box 3}\end{center}}
 {\bf Solving Ordinary Differential Equations}:
 
 The epidemic models take the form of ordinary differential
@@ -952,9 +986,148 @@ equations. Note that greater weighting is given to the increments at
 the midpoint of the chosen interval.
 \end{framed}
 
+\subsection{Parameter Optimisation}
+We now have no clearly identified our problem and the
+means by which we can attempt to solve it. That is, given a set of
+epidemic data, can we find a set of parameters that, when used to
+solve a set of ODEs, generate a model that accurately fits the
+data. Firstly, we select a set of initial test parameters. We then
+attempt to optimise these parameters to best fit our data using an
+optimisation algorithm alongside an objective function measuring model
+fit.
+
+\subsubsection{Initial Test Parameters}
+In classical epidemiology, it is often possible to obtain estimates of
+many important model parameters based on disease biology and
+population dynamics. For example, the initial susceptible population
+of an isolated influenza outbreak might be estimated as the school-aged
+population of a country. Similarly, the infection and recovery rates of a
+new strain of virus might be estimated based on phylogenetic relationships
+to previous viruses of known parameters.\cite{volz} Another potential method is to measure
+transmission rates in experimental populations, as demonstrated by
+Bouma et al., who estimated the transmission parameters of the H5N1
+avian influenza virus using a small number of birds in an experimental
+tranmission study.\cite{bouma} However, it is easy to imagine
+situations where parameter estimation might be infeasible. Estimating
+the susceptible population size for a viral \emph{YouTube} video, for
+example, might be difficult. Do we assume that the entire internet
+population is at risk of exposure, or will the video be limited to only
+certain internet communities? Such a scenario is not unimaginable for
+infectious diseases. Should a new, uncharacterised disease arise in
+only an unknown demographic, the task of estimating model parameters
+becomes very difficult.
+
+In scenarios where parameter estimation is infeasible, we aim to find
+the true model parameters without making any assumptions as to where
+they might lie other than within a realistic range. In the presented
+model fitting framework, we begin the parameter optimisation procedure
+with random parameter values taken from a realistic range with
+reasonable limitations imposed. For example, we seed the optimisation
+procedure with a random beta value between 0.0001 and 0.01. It is also
+important to ensure that a number of realistic conditions are adhered
+to:
+
+\begin{enumerate}
+  \item The basic reproductive ratio must be sufficient to allow an
+    epidemic to take off, $R0 > 1$. For this to be adhered to, gamma
+    must be greater than beta.
+  \item The initial number of susceptible individuals, $S_0$ must be
+    positive and within a reasonable range. Seeding with an
+    unrealistically high value might prevent the optimisation
+    procedure from converging on an optimal solution.
+  \item The initial number of infected individuals, $I_0$, must be
+    greater than 0. Whilst $I_0$ does not necessarily need to be bound
+   from above by $S_0$, it is more realistic to assume that $S_0$ is
+   much greater than $I_0$. 
+\end{enumerate}
+
+One heuristic for estimating the start value of $I_0$ is to take the
+first data point as the initial number of infected
+individuals. However, this causes the model to be highly dependent on
+first data point, neglecting to consider that the first data point
+might not represent the start of the epidemic. A more reasonable
+approach would be to consider $I_0$ as another unknown parameter to be
+optimised, or to assume that there is initially only one infected
+patient, or `patient zero'.
+
+\subsubsection{Parameter Transformations}
+
+\subsubsection{The Objective Function}
+With a set of model equations, potential model parameters and the
+resulting model data at each time point, the next step is to assess
+how well the proposed model fits the given data. It is only through
+quantifying this measurement that we can then go on to find the best
+fitting model parameters. As discussed in section BACKGROUND, the
+first assessment of fit that we implement is the least squares
+fit. This uses the total squared difference between each the model
+value and dataset value at each time point. The smaller this `sum of
+squared errors' (SSE), the better the model fit. Clearly our aim is to find
+the set of parameters that minimises this SSE. A central part of the
+model fitting framework is therefore the implementation of this
+`objective function' (Figure XX). Please refer to Box 2
+for a discussion of least squares fitting.
+
+\begin{center}
+\begin{figure}
+\begin{lstlisting}[language=R, style=customc]
+function(params, data) {
+    t <- data[,1]
+    cases <- data[,2]
+    beta <- params[1]
+    gamma <- params[2]
+    S0 <- params0[3]
+    I0 <- 1
+    R0 <- 0
+    out <- as.data.frame(ode(y=c(S=S0,I=I0,R=R0), times=t,closed.sir.model,parms=c(beta,gamma), atol=1e-15,hmax=1/120))
+    sse<-sum((out\$I-cases)^2)
+}
 
 
 
+\end{lstlisting}
+\caption{The above function takes a set of parameters and a set of
+  epidemic data. The \emph{ode} function is then uses the lsoda solver
+  evaluate the \emph{SIR} model using the provided parameters. The sum of squared
+  errors is then calculated from the generated model and provided data.}
+\end{figure}
+\end{center}
+
+
+\subsubsection{Optimisation Procedure}
+The next step in the model fitting framework is an implementation of
+an optimisation procedure to find the set of parameters that minimise
+the result of the objective function. In the initial \emph{R}
+implementation, this is done by passing the initial seed parameters,
+the objective function and the data to the \emph{optim}
+function. \emph{Optim} uses the Nelder-Mead algorithm to find the set
+of parameters in the parameter space that return the minimum objective
+function value. That is, the set of parameters that evaluate to a
+model that most closely fits the provided data. Box 4 provides a
+theoretical overview of the Nelder-Mead algorithm.
+
+- Discuss other optimisation algorithms that optim uses
+- Discuss the C++ implementation of Nelder-Mead, namely how we adapted
+ a primitive implementation to allow for an object of any class and a pointer to
+ any function can be passed along with a vector of any class
+ parameters.
+- Discuss the importance of iterations and error tolerance
+
+Figure XX illustrates the results of running \emph{optim} on a
+\emph{GillespieSSA} generated model with known parameters.
+
+\begin{centering}
+\begin{figure}
+\includegraphics[width=15cm]{simplefit.png}
+\caption{The Gillespie algorithm is run with original parameter values of $\beta =
+  0.001, \gamma = 0.1, S_0 = 500$. The \emph{optim} function returns
+  fitted parameter values of $\beta = 0.0008018066, \gamma = 0.1273486, S_0
+  = 618$. This results in a SSE of 5120.06.}
+\end{figure}
+\end{centering}
+
+
+
+\newpage
 \begin{framed}
 {\begin{center}{\bf Box 4}\end{center}}
 {\bf The Nelder-Mead Algorithm}:\\
@@ -1041,6 +1214,60 @@ small number of iterations during each run.\cite{nelder,singer}
  
 \end{framed}
 
+\subsection{Evaluating Goodness of Fit}
+Although the SSE provides a value which the optimisation process can
+aim to minimise, it's magnitude is largely meaningless without
+appropriate context. We therefore use the coefficient of
+determination, $R^2$, to provide an evaluation of model fit. $R^2$ is
+a widely used measure of goodness of fit in statistical modelling, and
+provides an ideal means for comparison between different model
+fits. $R^2$ provides a measure of what proportion of total variation
+in the data is explained by the model. A mathematical definition of
+the $R^2$ measure is provided in Box 5.
+
+\newpage
+\begin{framed}
+{\begin{center}{\bf Box 4}\end{center}}
+{\bf The Coefficient of Determiniation}:\\
+
+Consider a data set with observed values $y_i$. We would like to assess how
+well a set of predicted values $f_i$ fits our data. Firstly, we
+consider the amount of variability in our data set using the sum of
+squares:
+
+\begin{equation}
+  SS_{tot} = \sum\limits_{i}(y_i - \bar{y})^2
+\end{equation}
+
+Where $\bar{y}$ denotes the mean of the observed:
+
+\begin{equation}
+  \bar{y} = \frac{1}{n}\sum\limits_{i=1}^n(y_i)
+\end{equation}
+
+Next, we calculate the sum of squares of the residuals. That is, the
+amount of discrepancy between the data and the predicted values:
+
+\begin{equation}
+SS_{res} = \sum\limits_{i}(y_i - f_i)^2
+\end{equation}
+
+The final step is then to evaluate the amount of unexplained variance of
+the model with the total variance of the data. This gives us the
+\emph{coefficient of determination}, $R^2$:
+
+\begin{equation}
+  R^2 \equiv 1 - \frac{SS_{res}}{SS_{tot}}
+\end{equation}
+
+The resulting value is usually a number between 0 and 1, where 1
+suggests that the predicted values explain all of the variance of the
+data (a perfect fit), and a value close to 0 implies that it explains
+very little of the data
+variance (a poor fit). Values of less than 0 are also possible, which indicates
+that the mean of the data provides a better model fit than the model.
+
+\end{framed}
 
 \subsection{}
 
@@ -1169,6 +1396,13 @@ H. Nishiura, Real-time forecasting of an epidemic using a discrete time stochast
   S. Singer and J. Nelder. Nelder-Mead algorithm. \emph{Scholarpedia},
   2009;4(7):2928.
   \url{http://www.scholarpedia.org/article/Nelder-Mead_algorithm}. 
+\bibitem{volz}
+  EM. Volz, SL. Kosakovsky Pond, MJ. Ward, AJ. Leigh Brown and
+  SDW. Frost, Phylodynamics of Infectious Disease
+  Epidemics. \emph{Genetics} 2009;183(4):1421-1430
+\bibitem{bouma}
+  A. Bouma, et al., Estimation of Transmission Parameters of H5N1
+  Avian Influenza Virus in Chickens. \emph{PLoS Pathog}. 2009;5(1):e1000281
 
 \end{thebibliography}
 

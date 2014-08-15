@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.10.23)  14 AUG 2014 21:16
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.10.23)  15 AUG 2014 19:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -355,23 +355,7 @@ File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
 File: listings.cfg 2007/02/22 1.4 listings configuration
 ))
 Package: listings 2007/02/22 1.4 (Carsten Heinz)
- (./report.aux
-
-LaTeX Warning: Label `sir' multiply defined.
-
-
-LaTeX Warning: Label `sir' multiply defined.
-
-
-LaTeX Warning: Label `sir' multiply defined.
-
-
-LaTeX Warning: Label `sir' multiply defined.
-
-
-LaTeX Warning: Label `singer' multiply defined.
-
-)
+ (./report.aux)
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 44.
@@ -386,7 +370,7 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 44.
 LaTeX Font Info:    ... okay on input line 44.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 44.
 LaTeX Font Info:    ... okay on input line 44.
- (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
+(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count126
 \scratchdimen=\dimen148
@@ -456,13 +440,90 @@ Package pdftex.def Info: ImperialCrest.jpg used on input line 68.
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./ImperialCrest.jpg>]
-[1] [2] [3] <marily2014.png, id=21, 739.26187pt x 231.86626pt>
-File: marily2014.png Graphic file (type png)
+[1] [2]
 
-<use marily2014.png>
+LaTeX Warning: Citation `who' on page 3 undefined on input line 109.
+
+
+LaTeX Warning: Citation `dawkins' on page 3 undefined on input line 126.
+
+
+LaTeX Warning: Citation `meme' on page 3 undefined on input line 129.
+
+
+LaTeX Warning: Citation `hartmann' on page 3 undefined on input line 134.
+
+
+LaTeX Warning: Citation `bieber' on page 3 undefined on input line 134.
+
+
+LaTeX Warning: Citation `marily2013' on page 3 undefined on input line 142.
+
+
+LaTeX Warning: Citation `meme' on page 3 undefined on input line 142.
+
+
+LaTeX Warning: Citation `wang' on page 3 undefined on input line 142.
+
+
+LaTeX Warning: Citation `marily2013' on page 3 undefined on input line 147.
+
+
+LaTeX Warning: Citation `meme' on page 3 undefined on input line 147.
+
+
+LaTeX Warning: Citation `wang' on page 3 undefined on input line 147.
+
+
+LaTeX Warning: Citation `hu' on page 3 undefined on input line 147.
+
+
+LaTeX Warning: Citation `marily2013' on page 3 undefined on input line 151.
+
+
+LaTeX Warning: Citation `singer' on page 3 undefined on input line 155.
+
+
+LaTeX Warning: Citation `bastos' on page 3 undefined on input line 155.
+
+
+LaTeX Warning: Citation `marily2014' on page 3 undefined on input line 158.
+
+[3] <marily2014.png, id=22, 739.26187pt x 231.86626pt>
+File: marily2014.png Graphic file (type png)
+ <use marily2014.png>
 Package pdftex.def Info: marily2014.png used on input line 170.
 (pdftex.def)             Requested size: 398.33858pt x 124.93701pt.
- [4 <./marily2014.png>] [5]
+
+
+LaTeX Warning: Citation `marily2014' on page 4 undefined on input line 171.
+
+
+LaTeX Warning: Citation `marily2014' on page 4 undefined on input line 171.
+
+[4 <./marily2014.png>] [5]
+
+LaTeX Warning: Citation `computational' on page 6 undefined on input line 262.
+
+
+LaTeX Warning: Citation `variolation' on page 6 undefined on input line 264.
+
+
+LaTeX Warning: Citation `hippo' on page 6 undefined on input line 264.
+
+
+LaTeX Warning: Citation `brauer' on page 6 undefined on input line 266.
+
+
+LaTeX Warning: Citation `snow' on page 6 undefined on input line 266.
+
+
+LaTeX Warning: Citation `snow' on page 6 undefined on input line 266.
+
+
+LaTeX Warning: Citation `kermack' on page 6 undefined on input line 266.
+
+
 Overfull \hbox (1.39687pt too wide) in paragraph at lines 268--269
 []\OT1/cmr/m/n/10.95 The most ba-sic form of the model prosed by Ker-mack and M
 cK-endrick's ODEs is the Susceptible-
@@ -473,7 +534,45 @@ File: Rplot.png Graphic file (type png)
  <use Rplot.png>
 Package pdftex.def Info: Rplot.png used on input line 284.
 (pdftex.def)             Requested size: 341.43306pt x 341.44815pt.
- [7 <./Rplot.png (PNG copy)>] [8]
+ [7 <./Rplot.png (PNG copy)>]
+
+LaTeX Warning: Citation `anderson' on page 8 undefined on input line 304.
+
+
+LaTeX Warning: Citation `diekmann' on page 8 undefined on input line 304.
+
+
+LaTeX Warning: Citation `vynnycky' on page 8 undefined on input line 312.
+
+
+LaTeX Warning: Citation `sars' on page 8 undefined on input line 312.
+
+
+LaTeX Warning: Citation `cockman' on page 8 undefined on input line 312.
+
+
+LaTeX Warning: Citation `vynnycky' on page 8 undefined on input line 318.
+
+[8]
+
+LaTeX Warning: Citation `vynnycky' on page 9 undefined on input line 320.
+
+
+LaTeX Warning: Citation `kerkhove' on page 9 undefined on input line 322.
+
+
+LaTeX Warning: Citation `gleam' on page 9 undefined on input line 322.
+
+
+LaTeX Warning: Citation `gleam2' on page 9 undefined on input line 322.
+
+
+LaTeX Warning: Citation `tizzoni' on page 9 undefined on input line 322.
+
+
+LaTeX Warning: Citation `gefm' on page 9 undefined on input line 339.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 324--340
 
  []
@@ -483,11 +582,24 @@ Underfull \hbox (badness 10000) in paragraph at lines 324--340
 
  []
 
-[9] <sse.png, id=50, 501.875pt x 599.23875pt>
+[9]
+
+LaTeX Warning: Citation `marily2013' on page 10 undefined on input line 355.
+
+<sse.png, id=50, 501.875pt x 599.23875pt>
 File: sse.png Graphic file (type png)
  <use sse.png>
 Package pdftex.def Info: sse.png used on input line 357.
 (pdftex.def)             Requested size: 284.52756pt x 339.7409pt.
+
+
+LaTeX Warning: Citation `white' on page 10 undefined on input line 365.
+
+
+LaTeX Warning: Citation `hall' on page 10 undefined on input line 365.
+
+
+LaTeX Warning: Citation `nishiura' on page 10 undefined on input line 365.
 
 <logmle.png, id=51, 859.21pt x 658.46pt>
 File: logmle.png Graphic file (type png)
@@ -500,7 +612,17 @@ File: mle.png Graphic file (type png)
  <use mle.png>
 Package pdftex.def Info: mle.png used on input line 369.
 (pdftex.def)             Requested size: 398.33858pt x 305.26643pt.
- [10 <./sse.png (PNG copy)>] [11 <./logmle.png>] [12 <./mle.png>]
+ [10 <./sse.png (PNG copy)>] [11 <./logmle.png>]
+
+LaTeX Warning: Citation `goffman' on page 12 undefined on input line 376.
+
+
+LaTeX Warning: Citation `goffman' on page 12 undefined on input line 376.
+
+[12 <./mle.png>]
+
+LaTeX Warning: Citation `meme' on page 13 undefined on input line 378.
+
 <statsdist.png, id=66, 3767.82657pt x 533.74406pt>
 File: statsdist.png Graphic file (type png)
  <use statsdist.png>
@@ -511,19 +633,57 @@ Overfull \hbox (2.27618pt too wide) in paragraph at lines 382--383
  [][] 
  []
 
-[13 <./statsdist.png>] [14] <hatfield.png, id=74, 734.745pt x 554.07pt>
-File: hatfield.png Graphic file (type png)
 
-<use hatfield.png>
+LaTeX Warning: Citation `meme' on page 13 undefined on input line 383.
+
+
+LaTeX Warning: Citation `meme' on page 13 undefined on input line 383.
+
+
+LaTeX Warning: Citation `bieber' on page 13 undefined on input line 387.
+
+
+LaTeX Warning: Citation `marily2013' on page 13 undefined on input line 389.
+
+[13 <./statsdist.png>]
+
+LaTeX Warning: Citation `cannarella' on page 14 undefined on input line 391.
+
+
+LaTeX Warning: Citation `facebook' on page 14 undefined on input line 393.
+
+
+LaTeX Warning: Citation `facegroup' on page 14 undefined on input line 395.
+
+[14] <hatfield.png, id=74, 734.745pt x 554.07pt>
+File: hatfield.png Graphic file (type png)
+ <use hatfield.png>
 Package pdftex.def Info: hatfield.png used on input line 399.
 (pdftex.def)             Requested size: 341.43306pt x 257.47925pt.
- <facegroup.png, id=75, 727.0362pt x 546.3612pt>
-File: facegroup.png Graphic file (type png)
 
-<use facegroup.png>
+
+LaTeX Warning: Citation `facegroup' on page 15 undefined on input line 400.
+
+
+LaTeX Warning: Citation `facegroup' on page 15 undefined on input line 400.
+
+<facegroup.png, id=75, 727.0362pt x 546.3612pt>
+File: facegroup.png Graphic file (type png)
+ <use facegroup.png>
 Package pdftex.def Info: facegroup.png used on input line 406.
 (pdftex.def)             Requested size: 341.43306pt x 256.58138pt.
- [15 <./hatfield.png> <./facegroup.png>] [16]
+
+
+LaTeX Warning: Citation `facegroup' on page 15 undefined on input line 407.
+
+
+LaTeX Warning: Citation `facegroup' on page 15 undefined on input line 407.
+
+[15 <./hatfield.png> <./facegroup.png>] [16]
+
+LaTeX Warning: Citation `facegroup' on page 17 undefined on input line 459.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 448--460
 
  []
@@ -533,20 +693,119 @@ Underfull \hbox (badness 10000) in paragraph at lines 448--460
 
  []
 
-[17] [18]
+[17]
+
+LaTeX Warning: Citation `computational' on page 18 undefined on input line 525.
+
+
+
+LaTeX Warning: Citation `tizzoni' on page 18 undefined on input line 540.
+
+
+LaTeX Warning: Citation `gefm' on page 18 undefined on input line 540.
+
+
+LaTeX Warning: Citation `danon' on page 18 undefined on input line 558.
+
+[18]
+
+LaTeX Warning: Citation `bisset' on page 19 undefined on input line 569.
+
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 572.
 
- (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
+(/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <10.95> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 572.
- [19]
-[20] [21] <simplesir.png, id=101, 602.25pt x 621.32124pt>
+
+
+LaTeX Warning: Citation `turner' on page 19 undefined on input line 589.
+
+
+LaTeX Warning: Citation `zanette' on page 19 undefined on input line 596.
+
+
+LaTeX Warning: Citation `altshuler' on page 19 undefined on input line 609.
+
+
+LaTeX Warning: Citation `kermack' on page 19 undefined on input line 625.
+
+
+LaTeX Warning: Citation `vynnycky' on page 19 undefined on input line 633.
+
+
+LaTeX Warning: Citation `tizzoni' on page 19 undefined on input line 639.
+
+
+LaTeX Warning: Citation `gefm' on page 19 undefined on input line 639.
+
+
+LaTeX Warning: Citation `white' on page 19 undefined on input line 639.
+
+
+LaTeX Warning: Citation `hall' on page 19 undefined on input line 639.
+
+
+LaTeX Warning: Citation `nishiura' on page 19 undefined on input line 639.
+
+[19]
+
+LaTeX Warning: Citation `cannarella' on page 20 undefined on input line 647.
+
+
+LaTeX Warning: Citation `facebook' on page 20 undefined on input line 647.
+
+
+LaTeX Warning: Citation `marily2013' on page 20 undefined on input line 649.
+
+
+LaTeX Warning: Citation `marily2014' on page 20 undefined on input line 649.
+
+
+LaTeX Warning: Citation `bieber' on page 20 undefined on input line 649.
+
+
+LaTeX Warning: Citation `marily2013' on page 20 undefined on input line 668.
+
+
+LaTeX Warning: Citation `cannarella' on page 20 undefined on input line 679.
+
+
+LaTeX Warning: Citation `facebook' on page 20 undefined on input line 679.
+
+
+LaTeX Warning: Citation `tizzoni' on page 20 undefined on input line 688.
+
+
+LaTeX Warning: Citation `altshuler' on page 20 undefined on input line 691.
+
+
+LaTeX Warning: Citation `tizzoni' on page 20 undefined on input line 691.
+
+
+LaTeX Warning: Citation `meme' on page 20 undefined on input line 692.
+
+
+LaTeX Warning: Citation `marily2013' on page 20 undefined on input line 703.
+
+
+LaTeX Warning: Citation `marily2014' on page 20 undefined on input line 703.
+
+[20]
+
+LaTeX Warning: Citation `languagespeed' on page 21 undefined on input line 728.
+
+
+[21] <simplesir.png, id=101, 602.25pt x 621.32124pt>
 File: simplesir.png Graphic file (type png)
  <use simplesir.png>
-Package pdftex.def Info: simplesir.png used on input line 789.
+Package pdftex.def Info: simplesir.png used on input line 786.
 (pdftex.def)             Requested size: 426.79134pt x 440.32584pt.
+
+
+LaTeX Warning: No positions in optional float specifier.
+               Default added (so using `!tbp') on input line 802.
 
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
@@ -558,55 +817,100 @@ File: lstlang2.sty 2004/09/05 1.3 listings language file
 File: lstlang3.sty 2004/09/05 1.3 listings language file
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 813.
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 814.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 805.
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 807.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/omlcmr.fd
 File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OML/cmr/bx/n' in size <10.95> not available
-(Font)              Font shape `OML/cmm/b/it' tried instead on input line 814.
+(Font)              Font shape `OML/cmm/b/it' tried instead on input line 807.
 LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 821.
+(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 812.
+
+
+LaTeX Warning: Reference `fig:sirR' on page 22 undefined on input line 840.
+
+
+LaTeX Warning: Reference `fig:sircurves' on page 22 undefined on input line 868
+.
 
 <Rplot01.png, id=102, 602.25pt x 621.32124pt>
 File: Rplot01.png Graphic file (type png)
  <use Rplot01.png>
-Package pdftex.def Info: Rplot01.png used on input line 841.
+Package pdftex.def Info: Rplot01.png used on input line 874.
 (pdftex.def)             Requested size: 426.79134pt x 440.32584pt.
- [22] [23 <./simplesir.png (PNG copy)>] [24]
-Underfull \vbox (badness 3029) detected at line 953
+ [22] [23 <./simplesir.png (PNG copy)>]
+
+LaTeX Warning: Citation `atkinson' on page 24 undefined on input line 926.
+
+
+LaTeX Warning: Citation `shabbir' on page 24 undefined on input line 938.
+
+
+LaTeX Warning: Citation `nucci' on page 24 undefined on input line 941.
+
+
+LaTeX Warning: Citation `khan' on page 24 undefined on input line 941.
+
+[24]
+Underfull \vbox (badness 10000) detected at line 987
  []
 
-[25 <./Rplot01.png (PNG copy)>]
-<nelder.png, id=119, 478.03593pt x 306.39468pt>
+
+Underfull \vbox (badness 10000) detected at line 987
+ []
+
+[25 <./Rplot01.png (PNG copy)>] [26]
+
+LaTeX Warning: Citation `volz' on page 27 undefined on input line 1006.
+
+
+LaTeX Warning: Citation `bouma' on page 27 undefined on input line 1010.
+
+[27] [28] <simplefit.png, id=128, 602.25pt x 621.32124pt>
+File: simplefit.png Graphic file (type png)
+ <use simplefit.png>
+Package pdftex.def Info: simplefit.png used on input line 1120.
+(pdftex.def)             Requested size: 426.79134pt x 440.32584pt.
+
+[29] [30 <./simplefit.png (PNG copy)>]
+<nelder.png, id=136, 478.03593pt x 306.39468pt>
 File: nelder.png Graphic file (type png)
  <use nelder.png>
-Package pdftex.def Info: nelder.png used on input line 1026.
+Package pdftex.def Info: nelder.png used on input line 1199.
 (pdftex.def)             Requested size: 426.79134pt x 273.55064pt.
- [26]
-Underfull \vbox (badness 10000) detected at line 1042
+
+
+LaTeX Warning: Citation `nelder' on page 31 undefined on input line 1213.
+
+
+LaTeX Warning: Citation `singer' on page 31 undefined on input line 1213.
+
+
+Overfull \vbox (1.47049pt too high) detected at line 1215
  []
 
+[31] [32 <./nelder.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1231--1232
 
-Underfull \vbox (badness 10000) detected at line 1042
  []
 
-[27] [28 <./nelder.png>] [29] [30]
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 1065
+[33] [34] [35]
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 1292
 .
-
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [31]
-Underfull \hbox (badness 10000) in paragraph at lines 1114--1115
+)
+[36]
+Underfull \hbox (badness 10000) in paragraph at lines 1341--1342
 []\OT1/cmr/m/n/10.95 Develing, M; Adamic, L; Tay-lor, S. De-bunk-ing Prince-ton
 . URL:
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1116--1117
+Underfull \hbox (badness 10000) in paragraph at lines 1343--1344
 []\OT1/cmr/m/n/10.95 Facegroup. How stuff spreads: How videos go vi-ral part I.
  URL:
  []
@@ -614,25 +918,28 @@ Underfull \hbox (badness 10000) in paragraph at lines 1116--1117
 Missing character: There is no â in font cmr10!
 Missing character: There is no € in font cmr10!
 Missing character: There is no “ in font cmr10!
-[32]
-Overfull \hbox (3.43353pt too wide) in paragraph at lines 1148--1149
+[37]
+Overfull \hbox (3.43353pt too wide) in paragraph at lines 1375--1376
 []\OT1/cmr/m/n/10.95 CDC Flu-View Web Por-tal. URL: http://gis.cdc.gov/grasp/fl
 uview/fluportaldashboard.html 
  []
 
-[33] (./report.aux)
+[38] (./report.aux)
 
-LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 7688 strings out of 494966
- 111219 string characters out of 3178674
- 239595 words of memory out of 3000000
- 10742 multiletter control sequences out of 15000+200000
+ 7738 strings out of 494966
+ 111725 string characters out of 3178674
+ 317594 words of memory out of 3000000
+ 10791 multiletter control sequences out of 15000+200000
  13789 words of font info for 50 fonts, out of 3000000 for 9000
  36 hyphenation exceptions out of 8191
- 42i,16n,43p,1500b,2054s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 42i,16n,43p,1500b,2056s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb></usr/share/texlive/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dis
@@ -651,10 +958,10 @@ dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/public/amsfonts/cm/cmti8.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/typ
 e1/urw/courier/ucrr8a.pfb>
-Output written on report.pdf (34 pages, 3115125 bytes).
+Output written on report.pdf (39 pages, 3160260 bytes).
 PDF statistics:
- 207 PDF objects out of 1000 (max. 8388607)
- 132 compressed objects within 2 object streams
+ 226 PDF objects out of 1000 (max. 8388607)
+ 145 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 61 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 66 words of extra memory for PDF output out of 10000 (max. 10000000)
 

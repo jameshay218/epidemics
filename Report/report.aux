@@ -111,21 +111,32 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Development Environment}{21}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}Programming Languages}{21}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Single Epidemic Fitting}{22}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Parameter Optimisation}{22}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Data Management}{22}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Candidate Models}{22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Data Management}{22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Candidate Models}{22}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Example synthetic epidemic data generated using the \emph  {GillespieSSA} algorithm in \emph  {R}. In this model: $beta = 0.0015, gamma = 0.1, S0 = 800, I0 = 1$.\relax }}{23}}
 \citation{atkinson}
 \citation{shabbir}
 \citation{nucci}
 \citation{khan}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Example synthetic epidemic data generated using the \emph  {GillespieSSA} algorithm in \emph  {R}. In this model: $beta = 0.0015, gamma = 0.1, S0 = 800, I0 = 1$.\relax }}{23}}
+\newlabel{sirR}{{\caption@xref {sirR}{ on input line 861}}{24}}
 \@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Depiction of how various candidate model parameters give varying levels of fit for a given dataset\relax }}{25}}
+\newlabel{sircurves}{{7}{25}}
+\citation{volz}
+\citation{bouma}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Parameter Optimisation}{27}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.1}Initial Test Parameters}{27}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The above function takes a set of parameters and a set of epidemic data. The \emph  {ode} function is then uses the lsoda solver evaluate the \emph  {SIR} model using the provided parameters. The sum of squared errors is then calculated from the generated model and provided data.\relax }}{28}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.2}Parameter Transformations}{28}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.3}The Objective Function}{28}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.4}Optimisation Procedure}{28}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces The Gillespie algorithm is run with original parameter values of $\beta = 0.001, \gamma = 0.1, S_0 = 500$. The \emph  {optim} function returns fitted parameter values of $\beta = 0.0008018066, \gamma = 0.1273486, S_0 = 618$. This results in a SSE of 5120.06.\relax }}{30}}
 \citation{nelder}
 \citation{singer}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces A) Reflection. B) Exansion. C) Outside contraction. D) Inside contraction. E) Shrink transformation\relax }}{28}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}}{28}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Multiple Epidemic Fitting}{29}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Evaluation}{30}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces A) Reflection. B) Exansion. C) Outside contraction. D) Inside contraction. E) Shrink transformation\relax }}{32}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Evaluating Goodness of Fit}{32}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}}{33}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Multiple Epidemic Fitting}{34}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Evaluation}{35}}
 \bibcite{who}{1}
 \bibcite{dawkins}{2}
 \bibcite{hartmann}{3}
@@ -144,7 +155,7 @@
 \bibcite{brauer}{16}
 \bibcite{snow}{17}
 \bibcite{kermack}{18}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusions and Future Work}{31}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusions and Future Work}{36}}
 \bibcite{vynnycky}{19}
 \bibcite{anderson}{20}
 \bibcite{diekmann}{21}
@@ -175,3 +186,5 @@
 \bibcite{atkinson}{46}
 \bibcite{nelder}{47}
 \bibcite{singer}{48}
+\bibcite{volz}{49}
+\bibcite{bouma}{50}
