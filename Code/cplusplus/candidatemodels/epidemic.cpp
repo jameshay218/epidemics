@@ -6,12 +6,16 @@ using namespace std;
 Epidemic::~Epidemic(){
 }
 
-Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type){
+// Constructor
+Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int detection){
+  // Determine the type of epidemic and adjust population size stores accordingly
   if(_type==sir || _type==irsir){
     noPops=3;
   }
   else if(_type==spike){
     noPops=1;
+  }
+  else if (_type==seir){
   }
   else{
     noPops=4;
@@ -23,22 +27,30 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type){
   dPop3.resize(noPops);
   dPop4.resize(noPops);
   tmpPop.resize(noPops);
-
   initialPop.resize(noPops);
   populations.resize(noPops);
+
   diffIndex = 0;
-  step = 1.0;
+  
+  // Step size for Runge Kutta
+  step = 0.1;
+  
+  // Desired size of total solved model
   tmax = _tmax;
+
+  // Set current data
   current_data = x;
-  temp_model.resize(x.size());
+  temp_model.resize(x.size()/step);
+
   // Create a vector with the appropriate first column (ie. time values)
-  for(unsigned int i=0;i<x.size();++i){
-    temp_model[i].resize(4);
+  for(unsigned int i=0;i<(x.size()/step);++i){
+    temp_model[i].resize(2);
     fill(temp_model[i].begin(),temp_model[i].end(),0.0);
     temp_model[i][0] = i;
   }
   total_model = temp_model;
   type = _type;
+  detectionTime = detection;
 }
 
 /* ============================= RUNGE KUTTA INTEGRATION ALGORITHM =========================*/
@@ -87,29 +99,37 @@ void Epidemic::Runge_Kutta(){
 void Epidemic::Solve_Eq_t0(vector<vector<double> >& _results, int index){
   t=0;
   int i=0;
+  _results[i][0] = t + t0;
+  _results[i][1] = populations[index];
+  t+=step;
+  i++;
   do{
     Runge_Kutta();
-    _results[i][0] = t + int(t0);
+    _results[i][0] = t + t0;
     _results[i][1] = populations[index];
     t+=step; // Step size
     i++;
   }
-  while(t<current_data.size());
+  while((current_data.size()-t) > step);
 }
 
 /* Solves the ODEs for the current SIR parameters and saves these to _results. Difference
    to above is that this is carried out for the entire data range (tmax) */
 void Epidemic::Solve_Eq_total(vector<vector<double> >& _results, int index){
-  t=0;
+  t=0.0;
   int i=0;
+  _results[i][0] = t + t0;
+  _results[i][1] = populations[index];
+  t+=step;
+  i++;
   do{
     Runge_Kutta();
-    _results[i][0] = t + int(t0);
+    _results[i][0] = t + t0;
     _results[i][1] = populations[index];
     t+=step; // Step size
     i++;
   }
-  while(t<tmax);
+  while((tmax - t) > step);
 }
 
 
@@ -136,53 +156,6 @@ double Epidemic::poisson_pmf(const double k, const double lambda) {
 }
 
 
-/* Goes through to sets of data and adds all values (apart from the first column, which is the time
-   values). Returns the combined result. NOTE PASSED VECTORS HAVE 4 COLUMNS */
-vector<vector<double> > Epidemic::combine_vectors(vector<vector<double> > data1, vector<vector<double> > data2){
-  unsigned int i = 0;
-  unsigned int j = 0;
-  unsigned int k = 0;
-  
-  vector<vector<double> > final = data1;
-  
-  while(i < data1.size() && j < data2.size()){
-    if(data1[i][0] == data2[j][0]){
-      final[k][0] = data1[i][0];
-      final[k][1] = data1[i][1] + data2[j][1];
-      /*
-      for(l=1;l<=noPops;++l){
-	final[k][l] = data1[i][l] + data2[j][l];
-	}*/
-      i++;
-      j++;
-      k++;
-    }
-    //If first dataset is still before second, full difference
-    else if(data1[i][0] < data2[j][0]){
-      final[k][0] = data1[i][0];
-      final[k][1] = data1[i][1];
-      /*
-      for(l=1;l<=noPops;++l){
-	final[k][l] = data1[i][l];
-	}*/
-      i++;
-      k++;
-    }
-    //...
-    else{
-      final[k][0] = data2[j][0];
-      final[k][1] = data2[j][1];
-      /*
-      for(l=1;l<=noPops;++l){
-	final[k][l] = data2[j][l];
-	}*/
-      j++;
-      k++;
-    }
-  }
-  return(final);
-}
-
 
 
 
@@ -202,7 +175,7 @@ void Epidemic::reset_models(int size){
   for(int i=0;i<size;++i){
     temp_model[i].resize(2);
     fill(temp_model[i].begin(),temp_model[i].end(),0.0);
-    temp_model[i][0] = i;
+    temp_model[i][0] = i*step;
   }
   total_model= temp_model;
 }

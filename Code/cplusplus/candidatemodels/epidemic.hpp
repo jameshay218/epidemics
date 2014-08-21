@@ -21,18 +21,18 @@ protected:
   vector<double> dPop, dPop1, dPop2, dPop3, dPop4, tmpPop, initialPop, populations;
   vector<double> pars;
   vector<vector<double> > current_data, temp_model, total_model;
-  int noPops, diffIndex; //resize the pop vectors to fit this
+  int noPops, diffIndex, detectionTime; //resize the pop vectors to fit this
   EpiType type;
 
 public:
   int infectedIndex;
   Epidemic();
-  Epidemic(double _tmax, vector<vector<double> > x, EpiType _type);
+  Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int detection);
   virtual ~Epidemic() = 0;
 
-  vector<vector<double> > combine_vectors(vector<vector<double> > data1, vector<vector<double> > data2);
   vector<double> return_parameters();
   EpiType return_type() { return type;};
+  int return_detection_time(){return detectionTime;};
   void update_data(vector<vector<double> > x);
   virtual bool param_check() = 0;
   void reset_models(int size);

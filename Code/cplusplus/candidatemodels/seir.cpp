@@ -35,10 +35,9 @@ double SEIR::mle_sir(vector<double> parameters) {
   populations[3] = 0.0;
   
   Solve_Eq_t0(temp_model, 2);
-  total_model = combine_vectors(total_model, temp_model);
 
   // Calculate the overall SSE between the combined model and current data
-  double mle = dpois(total_model,current_data);
+  double mle = dpois(temp_model,current_data);
   return(mle);
 }
 
@@ -63,9 +62,7 @@ vector<vector<double> > SEIR::ode_solve_combined(vector<double> parameters){
   populations[3] = 0.0;
   cout << beta << ' ' << alpha << ' ' << gamma << ' ' << populations[0] << ' ' << t0 << endl;      
   Solve_Eq_total(temp_model, 2);
-  total_model = combine_vectors(total_model, temp_model);
-
-  return(total_model);
+  return(temp_model);
 }
 
 vector<vector<double> > SEIR::ode_solve(vector<double> parameters){

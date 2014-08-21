@@ -83,10 +83,10 @@ template<class D, class OP, class X>
 vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of object
 			      OP& obj,                //object to work from
 			      vector<D> init,    //initial guess of the parameters
-			      D tol=1E8*numeric_limits<D>::epsilon(), //termination criteria
+			      D tol= 1E11*numeric_limits<D>::epsilon(), //termination criteria
 			      vector<vector<D> > x =  vector<vector<D> >(),
 			      //x: The Simplex
-			      int iterations=5E3){
+			      int iterations=1E2){
   
   int N=init.size(); 
   //space dimension

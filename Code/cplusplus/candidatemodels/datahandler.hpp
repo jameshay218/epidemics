@@ -35,7 +35,7 @@ public:
   ~Handler();
  
   void overall_test(double targetRsq);
-  vector<vector<double> > combine_vectors(vector<vector<double> > data1, vector<vector<double> > data2);
+  vector<vector<double> > combine_vectors(vector<vector<double> > model, vector<vector<double> > data);
   vector<vector<double> > create_empty_data_vector(int _rows);
   vector<double> rand_params(EpiType _type);
   void likelihood_test(vector<double> &params);
@@ -47,8 +47,9 @@ public:
   vector<vector<double> > return_data(){
     return(current_data);
   }
+  void remove_epidemic(Epidemic* remove);
   vector<Epidemic*> fewer_epidemics(int j);
-  void add_epidemic(EpiType _newEpidemic);
+  Epidemic* add_epidemic(EpiType _newEpidemic, int time);
   vector<double> concatenate_vectors(vector<double> a, vector<double> b);
   double import_data(const char* file);
   void print_vector(vector< vector<double> > my_data);
@@ -74,7 +75,8 @@ public:
   void testAddition(vector<vector<double> > data1, vector<vector<double> > data2, double offset);
   void test_detect(vector<vector<double> > &results, vector<double> &params);
   void realtime_fit(vector<vector<double> > &results, vector<double> &params, int version);
-
+  void reset_epidemics();
+  bool check_already_tested(vector<EpiType> tested, EpiType toCheck);
   vector<Epidemic*> copy_epidemics(vector<Epidemic*> epi);
   double calculate_SSE(vector<vector<double> > data1, vector<vector<double> > data2);
 };

@@ -4,6 +4,7 @@ using namespace std;
 
 
 SIR::~SIR(){
+  cout << "deleting" << endl;
 }
 
 /* ============================== MODEL EQUATIONS ============================== */
@@ -31,9 +32,8 @@ double SIR::mle_sir(vector<double> parameters) {
   populations[1] = 1.0;
   populations[2] = 0.0;
   Solve_Eq_t0(temp_model, 1);
-  total_model = combine_vectors(total_model, temp_model);
   // Calculate the overall SSE between the combined model and current data
-  double mle = dpois(total_model,current_data);
+  double mle = dpois(temp_model,current_data);
   return(mle);
 }
 
@@ -43,8 +43,7 @@ double SIR::mle_sir(vector<double> parameters) {
 /* Calculates a set of ODEs for each set of 4 parameters passed and returns the combined model */
 vector<vector<double> > SIR::ode_solve_combined(vector<double> parameters){
   pars = parameters;
-  reset_models(tmax);
-  
+  reset_models((tmax/step));
   beta = exp(parameters[0]);
   gamma = exp(parameters[1]);
   populations[0] = exp(parameters[2]);
@@ -52,15 +51,12 @@ vector<vector<double> > SIR::ode_solve_combined(vector<double> parameters){
   populations[1] = 1.0;
   populations[2] = 0.0;
   Solve_Eq_total(temp_model, 1);
-  total_model = combine_vectors(total_model, temp_model);
-  
-  return(total_model);
-}
+  return(temp_model);
+ }
 
 vector<vector<double> > SIR::ode_solve(vector<double> parameters){
   pars = parameters;
-  reset_models(current_data.size());
-  
+  reset_models((current_data.size()/step));
   beta = exp(parameters[0]);
   gamma = exp(parameters[1]);
   populations[0] = exp(parameters[2]);

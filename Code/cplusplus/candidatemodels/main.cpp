@@ -22,7 +22,6 @@ const int STEP_SIZE = 0.1;
 
 
 int main() {
-  
   Handler dataHandler;
   vector<vector<double> > finalResults;
   vector<double> finalParams;

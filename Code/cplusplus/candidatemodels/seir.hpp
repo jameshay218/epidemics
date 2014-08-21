@@ -11,7 +11,7 @@ protected:
   
 public:
   // Housekeeping functions
-  SEIR(double _tmax, vector<vector<double> > x, EpiType _type) : Epidemic(_tmax, x, _type){
+  SEIR(double _tmax, vector<vector<double> > x, EpiType _type, int detection) : Epidemic(_tmax, x, _type, detection){
     // Stores beta and gamma
     beta = 0.001;
     alpha = 0.01;
