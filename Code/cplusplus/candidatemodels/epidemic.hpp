@@ -34,7 +34,6 @@ public:
   EpiType return_type() { return type;};
   int return_detection_time(){return detectionTime;};
   void update_data(vector<vector<double> > x);
-  virtual bool param_check() = 0;
   void reset_models(int size);
 
   /* NORMAL ODE SOLVER */
@@ -42,12 +41,6 @@ public:
   void Runge_Kutta();
   void Solve_Eq_t0(vector<vector<double> >& _results, int index);
   void Solve_Eq_total(vector<vector<double> >& _results, int index);
-  
-
-  /* MLE SOLVER */
-  double dpois(vector<vector<double> > model, vector<vector<double> > data);
-  virtual double mle_sir(vector<double> parameters) = 0; 
-  double poisson_pmf(const double k, const double lambda);
   
 
   /* SSE SOLVER */

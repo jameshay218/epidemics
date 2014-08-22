@@ -32,16 +32,10 @@ public:
     pars.push_back(1);
   };
   ~SEIR();    
-  virtual bool param_check();
-
-
-
+ 
   /* NORMAL ODE SOLVER */
   virtual void Diff(vector<double> Pop);
 
-  /* MLE SOLVER */
-  virtual double mle_sir(vector<double> parameters); 
-  
   
   /* SSE SOLVER */
   virtual vector<vector<double> > ode_solve(vector<double> parameters);

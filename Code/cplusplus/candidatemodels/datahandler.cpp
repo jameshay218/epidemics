@@ -35,130 +35,152 @@ Handler::~Handler(){
 
 void Handler::realtime_fit_multi(double targetRSq){
   clock_t t1, t2; // To record the total run time
-  EpiType newEpidemic;
-  Epidemic* toRemove;
-  vector<double> finalParams, finalParamsTemp;
-  vector<vector<double> > baseModel, combinedResults, residuals, combinedResultsTemp;
+  EpiType newEpidemic; // Keep track of the type of a new epidemic to be added
+  Epidemic *toRemove, *bestFit; // Keep track of a newly created epidemic to allow deletion
+  vector<EpiType> candidateModels;
+  vector<double> finalParams, finalParamsTemp; // Keep track of parameters from optimisation
+  vector<vector<double> > baseModel, combinedResults, residuals, combinedResultsTemp; // 
   vector<vector<vector<double> > > componentResults, componentResultsTemp;
-  double RSquare, RSquareK1, SSE, tempSSE, currentBestSSE;
+  double RSquare, tempRSquare, SSE, tempSSE, currentBestSSE;
+  int iterations, tempIterations;
+  
+  candidateModels.push_back(spike);
+  candidateModels.push_back(sir);
+  candidateModels.push_back(seir);
 
   // Start of model fitting process
   t1=clock();
-  
-  // Test starting with 2 epidemics
-  //newEpidemic = sir;
-
-  //add_epidemic(newEpidemic, 10);
-  //newEpidemic = spike;
-  //add_epidemic(newEpidemic, 40);
-
+  epidemics.push_back(new_epidemic(sir, 10));
+  //add_epidemic(sir,20);
   // Start off with a baseline model of the mean of the first 4 points
   for(unsigned int j = 0; j <= 4; ++j){
-    temp_data.push_back(current_data[j]);
+    this->temp_data.push_back(this->current_data[j]);
   }
-  current_model = base_model(temp_data);
-  baseModel = current_model;
+  baseModel = this->current_model = base_model(this->temp_data);
 
   // For each time point in the current data set, carry out the fitting procedure
-  for(unsigned int i = 5;i<current_data.size();++i){
+  for(unsigned int i = 39;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
     // Clear temp vector and temp epidemics
-    temp_data.clear();
-    tempEpidemics.clear();
+    this->temp_data.clear();
+    this->tempEpidemics.clear();
     toRemove = NULL;
 
-    // Store all data up to the current index and update epidemics
+    // Store all data up to the current index and update epidemics with data
     for(unsigned int j = 0; j < i; ++j){
-      temp_data.push_back(current_data[j]);
+      this->temp_data.push_back(this->current_data[j]);
     } 
-    for(unsigned int f = 0;f<epidemics.size();++f){
-      epidemics[f]->update_data(temp_data);
+    for(unsigned int f = 0;f<this->epidemics.size();++f){
+      this->epidemics[f]->update_data(this->temp_data);
     }
-    cout << "About to optimise" << endl;
+
     // Create an optimised model fit for the given data (temp) and calculate RSquare from the SSE
-    SSE = optimiseEpidemics(finalParams, combinedResults, componentResults);
+    SSE = optimiseEpidemics(finalParams, combinedResults, componentResults, iterations);
     RSquare = 1 - SSE/SStot(temp_data, 1);
-    
+    cout << "Optimised fit, RSquare: " << RSquare << endl;
     // If fit is sufficiently good with k epidemics, try fitting with k-1 epidemics. If this fit
     // is sufficient, use k-1 epidemics.
-    if(RSquare > targetRSq && epidemics.size() > 0){
+    if(RSquare > targetRSq && this->epidemics.size() > 0){
       cout << "Considering removal of an epidemic" << endl;
       // Store current set of epidemics
-      tempEpidemics = epidemics;
+      this->tempEpidemics = this->epidemics;
       
       // Try removing each epidemic so far
-      for(unsigned int j = 0;j<epidemics.size();++j){
+      toRemove = NULL;
+      for(unsigned int j = 0;j<this->epidemics.size();++j){
 	// Create vector of epidemic types that have been removed
 	vector<EpiType> removedEpidemics;
-	
+
 	// Try removing the j'th epidemic. If that type has already been removed, increase j.
-	// if epidemics[j]->return_type() is not in removedEpidemics, then that. Otherwise, j++ and try again.
-	if(!check_already_tested(removedEpidemics, tempEpidemics[j]->return_type())){
-	  epidemics = fewer_epidemics(j);
+	// if epidemics[j]->return_type() is not in removedEpidemics, then that. Otherwise, j++ 
+	// and try again. This ensures that only one epidemic of each type is removed at a time.
+	if(!check_already_tested(removedEpidemics, this->tempEpidemics[j]->return_type())){
+	  this->epidemics = fewer_epidemics(j);
 	  currentBestSSE = 999999999.9;
 	
 	  // Calculate the fit without this epidemic
-	  tempSSE = optimiseEpidemics(finalParamsTemp, combinedResultsTemp, componentResultsTemp);
-	  RSquareK1 = 1 - tempSSE/SStot(temp_data,1);
+	  tempSSE = optimiseEpidemics(finalParamsTemp, combinedResultsTemp, componentResultsTemp, tempIterations);
+	  tempRSquare = 1 - tempSSE/SStot(temp_data,1);
 	
 	  // If sufficient fit from removing an epidemic, permanently remove epidemic from set
 	  // Otherwise, restore epidemics to full number. Also track which removal was best
-	  if(RSquareK1 > targetRSq && tempSSE < currentBestSSE){
+	  if(tempRSquare > targetRSq && tempSSE < currentBestSSE){
 	    toRemove = this->tempEpidemics[j];
-	    cout << "Fit improved. Removing an epidemic" << endl;
+	    cout << "Fit sufficient. Removing an epidemic" << endl;
 	    SSE = tempSSE;
 	    currentBestSSE = tempSSE;
-	    RSquare = RSquareK1;
+	    RSquare = tempRSquare;
 	    finalParams = finalParamsTemp;
 	    combinedResults = combinedResultsTemp;
 	    componentResults = componentResultsTemp;
+	    iterations = tempIterations;
 	  }
 	  else{
-	    cout << "No need to remove" << endl;
-	    toRemove = NULL;
-	    epidemics = tempEpidemics;
+	    this->epidemics = this->tempEpidemics;
 	  }
 	}
       }
       if(toRemove != NULL) remove_epidemic(toRemove);
     }
 
-    // Reset pointers in case epidemic was deleted
+    // Reset pointers in case epidemic was deleted (check for memory leak)
     reset_epidemics();
-    cout << "Epidemics reset " << endl;
+    
     // Check if a new epidemic has started. If so, and RSquare from current K epidemics 
     // insufficient, try fitting another. If this is a significantly better fit, permanently
     // add an extra epidemic.
-    residuals = get_residuals(temp_data, current_model, 1);
+    residuals = get_residuals(this->temp_data, this->current_model, 1);
     newEpidemic = check_epidemic(residuals);
+
+    // If so, try adding epidemic
     if(newEpidemic != none && RSquare < targetRSq){
       cout << "Epidemic detected!" << endl;
-      cout << "Epidemic type: " << newEpidemic << endl;
+      bestFit = NULL;
       // Temporarily store the current epidemic state and add a new epidemic to the current set
-      tempEpidemics = epidemics;
-      toRemove = add_epidemic(newEpidemic, i);
-      cout << "Number of epidemics: " << epidemics.size() << endl;
-      tempSSE = optimiseEpidemics(finalParamsTemp, combinedResultsTemp, componentResultsTemp);
-      RSquareK1 = 1 - tempSSE/SStot(temp_data,1);
-      cout << "Fit with additional epidemic: " << RSquareK1 << endl;
-      if(RSquareK1 > RSquare){
-	cout << "Fit improved with additional epidemic. Adding epidemic" << endl;
-	SSE = tempSSE;
-	currentBestSSE = tempSSE;
-	RSquare = RSquareK1;
-	finalParams = finalParamsTemp;
-	combinedResults = combinedResultsTemp;
-	componentResults = componentResultsTemp;
-      }
-      else{
-	//cout << "Deleting!" << endl;
-	//cout << "Address1: " << toRemove << endl;
+      this->tempEpidemics = this->epidemics;
+      for(unsigned int f = 0; f < candidateModels.size(); ++f){
+	toRemove = NULL;
+	currentBestSSE = 999999999.9;
+	newEpidemic = candidateModels[f];
+	cout << "Considering addition of ";
+	print_epidemic_type(newEpidemic);
+	cout << endl;
+	cout << "Epidemics size: " << epidemics.size() << endl;
+	toRemove = new_epidemic(newEpidemic, i);
+	this->epidemics.push_back(toRemove);
+	// Produce optimised fit with added epidemic
+	tempSSE = optimiseEpidemics(finalParamsTemp, combinedResultsTemp, componentResultsTemp, tempIterations);
+	tempRSquare = 1 - tempSSE/SStot(this->temp_data,1);
+	
+	cout << "Fit with additional epidemic: " << tempRSquare << endl;
+	cout << "Iterations taken: " << tempIterations << endl;
+	// If fit improved, keep track of epidemic. If best fit, add to epidemics at the end
+	if((tempRSquare > RSquare && tempSSE < currentBestSSE) || (tempRSquare > targetRSq && bestFit != NULL && (toRemove->return_parameters().size() < bestFit->return_parameters().size())) || (toRemove->return_parameters().size() == bestFit->return_parameters().size() && tempSSE < currentBestSSE && tempIterations < iterations)){
+	  cout << "Fit improved with additional epidemic. Add epidemic" << endl;
+	  if(bestFit != NULL) delete bestFit;
+	  bestFit = new_epidemic(newEpidemic,i);
+	  SSE = tempSSE;
+	  currentBestSSE = tempSSE;
+	  RSquare = tempRSquare;
+	  finalParams = finalParamsTemp;
+	  combinedResults = combinedResultsTemp;
+	  componentResults = componentResultsTemp;
+	  iterations = tempIterations;
+	}
 	remove_epidemic(toRemove);
+	reset_epidemics();
       }
-    }
-    // Reset pointers in case epidemic was deleted;
+      if(bestFit != NULL){
+	  cout << "Adding epidemic type: ";
+	  print_epidemic_type(bestFit->return_type());
+	  cout << endl;
+	  epidemics.push_back(bestFit);
+	  bestFit = NULL;
+	}
+      }
+      // Reset pointers in case epidemic was deleted;
     reset_epidemics();
        
     // Transform parameters back to normal space
@@ -166,7 +188,7 @@ void Handler::realtime_fit_multi(double targetRSq){
       finalParams[j] = exp(finalParams[j]);
     }
     // Plot graph
-    plotGraphMulti(componentResults, combinedResults, temp_data, i, finalParams, RSquare, 2);    
+    plotGraphMulti(componentResults, combinedResults, this->temp_data, i, finalParams, RSquare, 2);    
     
     // Print out results for this iteration
     cout << "Final SSE was: " << SSE << endl;
@@ -174,7 +196,7 @@ void Handler::realtime_fit_multi(double targetRSq){
     cout << "Final parameters: ";
     printcon(finalParams) ;
     cout << endl << "-----------------" << endl;
-    current_model = combinedResults;
+    this->current_model = combinedResults;
   }
   t2=clock();
   cout << "Time taken: " << (t2-t1)/CLOCKS_PER_SEC << endl << endl;
@@ -184,7 +206,6 @@ void Handler::realtime_fit_multi(double targetRSq){
 bool Handler::check_already_tested(vector<EpiType> tested, EpiType toCheck){
   for(unsigned int p = 0; p <tested.size();++p){
     if(toCheck == tested[p]){
-      cout << "Already tried removing epidemic type. Skip." << endl;
       return true;
     }
   }
@@ -204,17 +225,12 @@ vector<Epidemic*> Handler::fewer_epidemics(int j){
 }
 
 void Handler::reset_epidemics(){
-  cout << "Reseting epidemics" << endl;
   vector<Epidemic*> epi;
-  cout << "Number of epidemics: " << epidemics.size() << endl;
   for(unsigned int i = 0;i<epidemics.size();++i){
     if(epidemics[i] != NULL){
-      cout << "Pushing back epidemic" << endl;
-      cout << "Address: " << epidemics[i] << endl;
-      cout << epidemics[i]->return_type() << endl;
       epi.push_back(epidemics[i]);
     }
-  }
+   }
   epidemics = epi;
 }
 
@@ -228,7 +244,7 @@ void Handler::remove_epidemic(Epidemic* remove){
 }
 
 // Adds an epidemic of the provided type to the current vector of epidemics
-Epidemic* Handler::add_epidemic(EpiType _newEpidemic, int time){
+Epidemic* Handler::new_epidemic(EpiType _newEpidemic, int time){
   Epidemic *additionalEpi;
   switch(_newEpidemic){
   case sir:
@@ -244,17 +260,16 @@ Epidemic* Handler::add_epidemic(EpiType _newEpidemic, int time){
     additionalEpi = new SIR(current_data.size(),current_data,_newEpidemic, time);
     break;
   }
-  epidemics.push_back(additionalEpi);
   return(additionalEpi);
 }
 
-double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults){
+double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults, int& itr){
   double SSE = 99999999999.9;
   double tempSSE;
   vector<double> tempPar, seedParams;
   vector<vector<vector<double> > > tempAll;
   Simplex simplex;
-  
+  int iterations = 10001;
   // If no epidemics have yet been detected, use the mean of the current data as the 
   // current model and return the corresponding SSE.
   if(epidemics.size() == 0){
@@ -267,7 +282,7 @@ double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<doub
   }
 
   // If there are epidemics to be fitted, perform 40 random fits and keep best fitting model
-  for(int index=0;index<10;index++){
+  for(int index=0;index<5;index++){
     
             
     // Clear the temporary seed parameters and seed rand
@@ -279,13 +294,14 @@ double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<doub
     seedParams = generate_seed_parameters();
     
     // Get the optimised parameters from nelder mead algorithm
-    tempPar = simplex.neldermead(&Handler::fitEpidemics, *this,  seedParams);
+    tempPar = simplex.neldermead(&Handler::fitEpidemics, *this,  seedParams, iterations);
     // Store the SSE value for this
     tempSSE = fitEpidemics(tempPar);
 	
     // If this SSE value is better than the previous, store it and the
     // corresponding parameters
     if(tempSSE < SSE){
+      itr = iterations;
       SSE = tempSSE;
       parameters=tempPar;
     }
@@ -326,6 +342,22 @@ double Handler::fitEpidemics(vector<double> params){
     current_model = combine_vectors(current_model, temp_model);
   }
   return(calculate_SSE(current_model, temp_data));
+}
+
+double Handler::fitEpidemicsMLE(vector<double> params){
+  int z = 0;
+  current_model = create_empty_data_vector(temp_data.size());
+  for(unsigned int i = 0;i<epidemics.size();++i){
+    tempParams.clear();
+    temp_model.clear();
+    for(unsigned int x = 0;x<epidemics[i]->return_parameters().size();++x){
+      tempParams.push_back(params[z]);
+      z++;
+    }
+    temp_model = epidemics[i]->ode_solve(tempParams);
+    current_model = combine_vectors(current_model, temp_model);
+  }
+  return(dpois(current_model, temp_data));
 }
   
 // As above, but returns the overall model.
@@ -377,33 +409,26 @@ EpiType Handler::check_epidemic(vector<vector<double> > residuals){
     previousResiduals.push_back(residuals[j]);
   }
 
-  cout << "Latest residual value: " << residuals[residuals.size()-1][1] << endl;
-
   // Calculate the SD and mean of these residuals
   mean = calculate_mean(previousResiduals, 1);
   sd = calculate_sd(previousResiduals, 1);
 
-  cout << "Current residual mean: " << mean << endl;
-  cout << "Current residual SD: " << sd << endl;
-
   sirlimit = mean + 2*sd;
   explimit = mean + 6*sd;
-  
-  cout << "SIR limit: " << sirlimit << endl;
-  cout << "EXP limit: " << explimit << endl;
-  
+ 
   SIRresidual = residuals[residuals.size()-1][1];
   EXPresidual = residuals[residuals.size()-1][1];
 
-  cout << "SIR residual: " << SIRresidual << endl;
   for(unsigned int i = residuals.size()-1; i > previousResiduals.size();--i){
-    if(residuals[i][1] < EXPresidual) EXPresidual = residuals[i][1];
+    if((residuals[i][1] - EXPresidual) < 0) EXPresidual = residuals[i][1];
     //if(residuals[i][1] < SIRresidual) SIRresidual = residuals[i][1];
   }
-
-  if(EXPresidual > explimit) detected = spike;
-  else if(SIRresidual > sirlimit) cout << "Detected SIR" << endl; detected = sir;
-  
+ 
+  double diffEXP = EXPresidual - explimit;
+  double diffSIR = SIRresidual - sirlimit;
+  if(diffEXP > 0){ detected = spike;}
+  else if(diffSIR > 0){detected = sir;}
+ 
   return detected;
 }
 
@@ -512,7 +537,7 @@ vector<double> Handler::rand_params(EpiType _type){
   beta = (rand()%100+1)/10000.0;
   alpha = (rand()%100+1)/10000.0;
   gamma = (rand()%200+beta)/1000.0;
-  s0 = rand()%1000+100;
+  s0 = rand()%2000+101;
   //t0 = rand()%80+1;
   
   /*beta = 0.001;
@@ -664,6 +689,33 @@ vector<vector<double> > Handler::combine_vectors(vector<vector<double> > model, 
   return(final);
 }
 
+// Prints the epidemic type in standard output
+void Handler::print_epidemic_type(EpiType epi){
+  switch(epi){
+  case none:
+    cout << "none";
+    break;
+  case sir:
+    cout << "SIR";
+    break;
+  case seir:
+    cout << "SEIR";
+    break;
+  case serir:
+    cout << "SERIR";
+    break;
+  case irsir:
+    cout << "irSIR";
+    break;
+  case spike:
+    cout << "EXP";
+    break;
+  default:
+    break;
+  }
+}
+
+   
 
 
 /* ================================ GRAPH PLOTTING FUNCTIONS ===================================*/
@@ -776,79 +828,6 @@ vector<double> Handler::concatenate_vectors(vector<double> a, vector<double> b){
 
 
 
-
-void Handler::likelihood_test(vector<double> &params){
-  vector<double> parameters, tempParams;
-  vector<vector<double> > data, model;
-  //print_vector(current_data);
-  SIR mySIR(double(current_data.size()), current_data, sir, 1);
-  Simplex simplex;
-  parameters.push_back(log(0.001));
-  parameters.push_back(log(0.1));
-  parameters.push_back(log(500));
-  parameters.push_back(log(10));
-  
-  parameters.push_back(log(0.001));
-  parameters.push_back(log(0.05));
-  parameters.push_back(log(650));
-  parameters.push_back(log(50.0));
-  
-  parameters.push_back(log(0.002));
-  parameters.push_back(log(0.075));
-  parameters.push_back(log(450));
-  parameters.push_back(log(75.0));
-  
- 
-  data = mySIR.ode_solve_combined(parameters);
- 
-  mySIR.update_data(data);
-
-  parameters.clear();
-  parameters.push_back(log(0.002));
-  parameters.push_back(log(0.11));
-  parameters.push_back(log(500));
-  parameters.push_back(log(10));
-
-  parameters.push_back(log(0.0011));
-  parameters.push_back(log(0.055));
-  parameters.push_back(log(670));
-  parameters.push_back(log(50));
-  parameters.push_back(log(0.002));
-  parameters.push_back(log(0.075));
-  parameters.push_back(log(450));
-  parameters.push_back(log(75.0));
-  
-  cout << "Test: " << mySIR.mle_sir(parameters) << endl;
-  
-  tempParams = simplex.neldermead(&SIR::mle_sir, mySIR,  parameters);
-  cout << "Final log likelihood: " << mySIR.mle_sir(tempParams) << endl;
-  parameters.clear();
-  parameters.push_back(log(0.001));
-  parameters.push_back(log(0.1));
-  parameters.push_back(log(500));
-  parameters.push_back(log(10));
-  parameters.push_back(log(0.001));
-  parameters.push_back(log(0.05));
-  parameters.push_back(log(650));
-  parameters.push_back(log(50.0));
-  parameters.push_back(log(0.002));
-  parameters.push_back(log(0.075));
-  parameters.push_back(log(450));
-  parameters.push_back(log(75.0));
-  
-  cout << "Likelihood of actual parameters: " << mySIR.mle_sir(parameters) << endl;
-  //cout << "SSE: " << mySIR.calculate_SSE(model,data) << endl;
-  model = mySIR.ode_solve_combined(tempParams);
-  for(unsigned int i = 0;i<tempParams.size();++i){
-    tempParams[i] = exp(tempParams[i]);
-  }
-  printcon(tempParams);
-  plotGraph(model, data, 1);
-    
-}
-
-
-
 /* Calculates and returns the sum of squared errors between to sets of data. Checks 
    the first column to see if on the same time point, and finds squared difference if
    so. If one dataset is at an earlier time point, use the entire squared value as
@@ -900,40 +879,83 @@ double Handler::calculate_SSE(vector<vector<double> > data1, vector<vector<doubl
 
 
 
+/* Returns the negative log likelihood of a model given a set of data */
+double Handler::dpois(vector<vector<double> > model, vector<vector<double> > data){
+  unsigned int i = 0;
+  unsigned int j = 0;
+  double logLikelihood = 0;
+ 
+  while(j < model.size() && i < data.size()){
+    //If indices give same time point, find sse
+    if(fabs(model[i][0]- data[j][0])<EPSILON){
+      if(model[i][0] == 0 || data[j][0] == 0) logLikelihood += log(1);
+      else logLikelihood += pow((model[i][1] - data[j][1]),2.0);
+      i++;
+      j++;
+    }
+    //If first dataset is still before second, full difference
+    else if((model[i][0] - data[j][0]) > EPSILON){
+      j++;
+    }
+    //...
+    else{
+      i++;
+    }
+  }
+  return(logLikelihood);
+}
+
+
+double Handler::poisson_pmf(const double k, const double lambda) {
+  return exp(k * log(lambda) - lgamma(k + 1.0) - lambda);
+}
+
+
 
 
 
 
 void Handler::overall_test(double targetRsq){
+  Epidemic* toRemove1, *toRemove2;
   EpiType newEpidemic;
   vector<double> finalParams, finalParamsTemp;
   vector<vector<double> > baseModel, combinedResults, residuals, combinedResultsTemp, temp;
   vector<vector<vector<double> > > componentResults, componentResultsTemp;
-  double RSquare, RSquareK1, SSE, tempSSE, currentBestSSE;
-  cout << "Here" << endl;
+  double SSE;
+  int iter;
   newEpidemic = sir;
-  add_epidemic(newEpidemic, 0);
+  
+  toRemove1 = new_epidemic(newEpidemic, 0);
+  epidemics.push_back(toRemove1);
+  
   for(unsigned int f = 0;f<epidemics.size();++f){
     epidemics[f]->update_data(current_data);
   }
-    
-  cout << "Number of epidemics: " << epidemics.size() << endl;
+  
   cout << "Data size: " << current_data.size() << endl;
-
+ 
   temp_data = current_data;
   finalParams.push_back(log(0.001));  
+  //finalParams.push_back(log(0.01));  
+  //finalParams.push_back(log(0.01));  
   finalParams.push_back(log(0.1));  
-  //finalParams.push_back(log(0.05));  
   finalParams.push_back(log(500));
   finalParams.push_back(log(1));
-    //temp = epidemics[0]->ode_solve(finalParams);
+  // temp = epidemics[0]->ode_solve(finalParams);
   temp=ode_solve(finalParams);
+  printcon(finalParams);
+  finalParams[3] = log(1);
+  printcon(finalParams);
+  baseModel = ode_solve(finalParams);
+
   cout << "Temp size: " << temp.size() << endl;
   //  print_vector(temp);
-  print_vector(temp_data);
+  //  print_vector(temp_data);
   //return;
-  cout << calculate_SSE(temp,temp_data) << endl;
-  SSE = optimiseEpidemics(finalParams, combinedResults, componentResults);
+  cout << dpois(temp,baseModel) << endl;
+  plotGraph(temp,temp_data,1);
+  return;
+  SSE = optimiseEpidemics(finalParams, combinedResults, componentResults, iter);
   
   cout << SSE << endl;
   for(int i = 0;i<finalParams.size();++i){

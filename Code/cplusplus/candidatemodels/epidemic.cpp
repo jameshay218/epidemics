@@ -16,9 +16,13 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
     noPops=1;
   }
   else if (_type==seir){
+    noPops = 4;
+  }
+  else if (_type == serir){
+    noPops = 5;
   }
   else{
-    noPops=4;
+    noPops=3;
   }
 
   dPop.resize(noPops);
@@ -131,31 +135,6 @@ void Epidemic::Solve_Eq_total(vector<vector<double> >& _results, int index){
   }
   while((tmax - t) > step);
 }
-
-
-
-/* Returns the negative log likelihood of a model given a set of data */
-double Epidemic::dpois(vector<vector<double> > model, vector<vector<double> > data){
-  double logLikelihood;
-  int N = data.size();
-  logLikelihood = 0.0;
-  for(int i=0;i<N;++i){
-    if(model[i][1] == 0 && data[i][1] == 0){
-      logLikelihood += log(1);
-    }
-    else{
-      //logLikelihood += log(gsl_ran_poisson_pdf(model[i][2], data[i][2]));
-      logLikelihood += log(poisson_pmf(model[i][1], data[i][1]));
-    }
-  }
-  return(-logLikelihood);
-}
-
-double Epidemic::poisson_pmf(const double k, const double lambda) {
-  return exp(k * log(lambda) - lgamma(k + 1.0) - lambda);
-}
-
-
 
 
 

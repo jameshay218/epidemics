@@ -58,10 +58,12 @@ public:
   vector<D> neldermead(X(OP::*f)(vector<D>),   //target function of object
 		       OP& obj,                //object to work from
 		       vector<D> init,    //initial guess of the parameters
+		       int &its,
 		       D tol, //termination criteria
 		       vector<vector<D> > x,
 		       //x: The Simplex
-		       int iterations);
+		       int iterations
+		       );
   void print_out();
 };
 
@@ -83,11 +85,14 @@ template<class D, class OP, class X>
 vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of object
 			      OP& obj,                //object to work from
 			      vector<D> init,    //initial guess of the parameters
+			      int &its,
 			      D tol= 1E11*numeric_limits<D>::epsilon(), //termination criteria
 			      vector<vector<D> > x =  vector<vector<D> >(),
 			      //x: The Simplex
-			      int iterations=1E2){
+			      int iterations=1E3
+			      ){
   
+
   int N=init.size(); 
   //space dimension
   const double a=1.0, b=1.0, g=0.5, h=0.5;   //coefficients
@@ -215,6 +220,7 @@ vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of objec
     cout<<"*"<<flush;
     //return init;
   }
+  its = cnt;
   return x[x1];
   //return init;
 }

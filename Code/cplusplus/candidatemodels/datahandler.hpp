@@ -41,7 +41,7 @@ public:
   void likelihood_test(vector<double> &params);
   void realtime_fit_multi(double targetRSp);
   EpiType check_epidemic(vector<vector<double> > residuals);
-  double optimiseEpidemics(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults);
+  double optimiseEpidemics(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults, int& itr);
   double fitEpidemics(vector<double> params);
   // Data handling functions
   vector<vector<double> > return_data(){
@@ -49,7 +49,7 @@ public:
   }
   void remove_epidemic(Epidemic* remove);
   vector<Epidemic*> fewer_epidemics(int j);
-  Epidemic* add_epidemic(EpiType _newEpidemic, int time);
+  Epidemic* new_epidemic(EpiType _newEpidemic, int time);
   vector<double> concatenate_vectors(vector<double> a, vector<double> b);
   double import_data(const char* file);
   void print_vector(vector< vector<double> > my_data);
@@ -60,17 +60,29 @@ public:
   vector<vector<double> > ode_solve(vector<double> params);
   vector<vector<vector<double> > > ode_solve_separate(vector<double> params);
 
+  double dpois(vector<vector<double> > model, vector<vector<double> > data);
+  double poisson_pmf(const double k, const double lambda);
+  double fitEpidemicsMLE(vector<double> params);
+
+
   // Maths functions
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);
   double calculate_mean(vector<vector<double> > data, int column);
   double calculate_sd(vector<vector<double> > data, int column);
   vector<vector<double> > get_residuals(vector<vector<double> > data1, vector<vector<double> > data2, int index);
-  
+  void print_epidemic_type(EpiType epi);
+
+
+
   // Graph plotting functions
   void plotGraph(vector<vector<double> > finalResults, vector<vector<double> > data, int index);
   void plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, int column);
   string create_label(Epidemic* epi, vector<double> parameters, int& i);
+
+
+
+
   // Old functions
   void testAddition(vector<vector<double> > data1, vector<vector<double> > data2, double offset);
   void test_detect(vector<vector<double> > &results, vector<double> &params);

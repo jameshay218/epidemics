@@ -29,17 +29,12 @@ public:
     pars.push_back(1);
   };
   ~SIR();    
-  virtual bool param_check();
-
 
 
   /* NORMAL ODE SOLVER */
   virtual void Diff(vector<double> Pop);
  
 
-  /* MLE SOLVER */
-  virtual double mle_sir(vector<double> parameters); 
-  
   
   /* SSE SOLVER */
   //double overall_sse(vector<double> parameters);
