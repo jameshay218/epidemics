@@ -18,24 +18,6 @@ void SERIR::Diff(vector<double> Pop) {
 /* ================================== SSE FITTING PROCEDURE ================================= */
 
 
-/* Calculates a set of ODEs for each set of 4 parameters passed and returns the combined model */
-vector<vector<double> > SERIR::ode_solve_combined(vector<double> parameters){
-  pars = parameters;
-  reset_models(tmax/step);
-  beta = exp(parameters[0]);
-  alpha = exp(parameters[1]);
-  mu = exp(parameters[2]);
-  gamma = exp(parameters[3]);
-  populations[0] = exp(parameters[4]);
-  t0 = exp(parameters[5]);
-    
-  populations[1] = 0.0;
-  populations[2] = 1.0;
-  populations[3] = 0.0;
-  Solve_Eq_total(temp_model, 2);
-  return(temp_model);
-}
-
 vector<vector<double> > SERIR::ode_solve(vector<double> parameters){
   pars = parameters;
   reset_models(current_data.size()/step);
@@ -44,11 +26,16 @@ vector<vector<double> > SERIR::ode_solve(vector<double> parameters){
   mu = exp(parameters[2]);
   gamma = exp(parameters[3]);
   populations[0] = exp(parameters[4]);
-  t0 = exp(parameters[5]);
-  
+
+  if(optimT0 && parameters.size() > 4) 
+    if(optimI0) t0 = exp(parameters[6]);
+    else t0 = exp(parameters[5]);
+  else t0 = 0;
+  if(optimI0 && parameters.size() > 4) populations[2] = exp(parameters[5]);
+  else populations[2] = 1.0;
+
   populations[1] = 0.0;
-  populations[2] = 1.0;
   populations[3] = 0.0;
-  Solve_Eq_t0(temp_model,2);
+  Solve_Eq_t0(temp_model,1);
   return(temp_model);
 }

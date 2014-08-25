@@ -27,9 +27,9 @@ void printcon(const Con& c){
 class Handler{
 private:
   vector<double> tempParams;
-  vector<vector<double> > current_data, current_model, temp_model, empty_model, temp_data;
+  vector<vector<double> > current_data, current_model, temp_model, empty_model, temp_data, baseModel;
   vector<Epidemic*> epidemics, tempEpidemics;
-
+  bool useMLE, optimT0, optimI0, singleEpi, plot, save;
 public:
   Handler();
   ~Handler();
@@ -49,14 +49,16 @@ public:
   }
   void remove_epidemic(Epidemic* remove);
   vector<Epidemic*> fewer_epidemics(int j);
-  Epidemic* new_epidemic(EpiType _newEpidemic, int time);
+  Epidemic* new_epidemic(EpiType _newEpidemic, int time, double infected);
   vector<double> concatenate_vectors(vector<double> a, vector<double> b);
   double import_data(const char* file);
   void print_vector(vector< vector<double> > my_data);
   void print_vector(vector< vector<int> > my_data);
   vector<double> generate_seed_parameters();
-  
+  double optimise_single(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults, int& itr);
 
+  void update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, bool savePlot, bool saveResults);
+  void realtime_fit_single(double targetRSq, EpiType _epi);
   vector<vector<double> > ode_solve(vector<double> params);
   vector<vector<vector<double> > > ode_solve_separate(vector<double> params);
 
@@ -72,7 +74,7 @@ public:
   double calculate_sd(vector<vector<double> > data, int column);
   vector<vector<double> > get_residuals(vector<vector<double> > data1, vector<vector<double> > data2, int index);
   void print_epidemic_type(EpiType epi);
-
+  bool params_check(vector<double> pars, EpiType epi);
 
 
   // Graph plotting functions
