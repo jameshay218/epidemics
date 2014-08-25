@@ -1,0 +1,20 @@
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Model construction framework as proposed by Nika et al. 2014.\cite {marily2014}\relax }}{3}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Generic example of the classic SIR model demonstrating the change in population size for each compartment as the epidemic unfolds\relax }}{8}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Examples of the statistical distributions considered in Bauckhage et al.\cite {meme}\relax }}{16}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Graph \emph {Facegroup} depicting the uptake of the "Commander Hadfield" YouTube video, demonstrating the "growth" model as proposed by \emph {Facegroup}.\cite {facegroup}\relax }}{19}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Graph from \emph {Facegroup} depicting the uptake of the "Dove Real Beauty Sketches" YouTube video, demonstrating the "spike" model as proposed by \emph {Facegroup}.\cite {facegroup}\relax }}{19}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Example synthetic epidemic data generated using the \emph {GillespieSSA} algorithm in \emph {R}. In this model: $beta = 0.0015, gamma = 0.1, S0 = 800, I0 = 1$.\relax }}{29}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Implementation of the SIR model using the GillespieSSA package\relax }}{30}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Implementation of the Kermack-McKendrick SIR model\relax }}{30}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Graph demonstrating various levels of model fit\relax }}{31}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Least Squares Fitting Objective Function\relax }}{36}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces The Gillespie algorithm is run with original parameter values of $\beta = 0.001, \gamma = 0.1, S_0 = 500$. The \emph {optim} function returns fitted parameter values of $\beta = 0.0008018066, \gamma = 0.1273486, S_0 = 618$. This results in a SSE of 5120.06.\relax }}{37}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces A) Reflection. B) Exansion. C) Outside contraction. D) Inside contraction. E) Shrink transformation\relax }}{39}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Control flow of the basic model fitting framework\relax }}{42}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Iterative model fitting over time using least squares minimisation.\relax }}{43}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

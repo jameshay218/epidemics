@@ -1,0 +1,593 @@
+\chapter{Single Epidemic Fitting}
+\label{ch:single}
+
+In this section we explore the theory and implementation behind a
+model fitting framework for single SIR models with unknown
+parameters. To provide a simulation of real time model fitting, we
+iteratively fit a new, independently optimised model at each data point. Firstly, a
+least-squares fitting procedure is implemented in R for a single SIR
+epidemic where beta and gamma are assumed to be entirely
+unknown. We then extend the implementation to include the number of
+initial susceptible individuals, S0; the start time
+of the epidemic, t0; and the initial number of infected individuals, I0. This also raises
+the issue of epidemic outbreak detection and candidate model selection, which we
+will revisit in section SECTIONNNN!. We go on to use a maximum
+likelihood based approach which allows for the generation of
+confidence intervals. Finally, we reimplement the above approaches in
+C++ to provide a much faster fitting framework.
+
+\section{Epidemic Data}
+The data that we wish to characterise is the change in number of
+infected individuals over time. In this context, the term `infected individuals' may be
+defined as individuals infected with a disease, or individuals that
+have viewed a particular \emph{YouTube} video or `liked' a particular
+\emph{Facebook} post. Examples of this type of data are shown in
+Figure XX. \emph{R} is ideally suited for the easy management and
+manipulation of data through the use of the `data frame' type. In C++,
+we import data as .csv files and carry out all manipulation and use
+using vectors.
+
+
+\begin{center}
+\begin{figure}[ht!]
+
+\includegraphics[width=15cm]{simplesir.png}
+\caption{Example synthetic epidemic data generated using the
+  \emph{GillespieSSA} algorithm in \emph{R}. In this model: $beta =
+  0.0015, gamma = 0.1, S0 = 800, I0 = 1$.}
+\end{figure}  
+\end{center}
+
+We use the results of solving ODEs with known parameters and
+independent runs of the \emph{GillespieSSA} algorithm to test the
+framework's ability to find the true model
+parameters. \emph{GillespieSSA} provides an easy to use, extensible
+means of generating simulated trajectories of finite population
+continuous-time models. Algorithm 1 shows a basic implementation of the
+SIR model in R using \emph{GillespieSSA} for generation of synthetic data.
+
+\begin{algorithm}
+  \captionof{figure}{Implementation of the SIR model using the GillespieSSA package}
+  \begin{algorithmic}
+    \Function{gillespie.ssa.sir}{$params, I0, time, i$}
+    \State \emph{\# Define parameters}
+    \State parms $\gets$ c(beta=params[1],gamma=params[2])
+    \State
+    \State \emph{\# Define system}
+    \State x0 $\gets$ c(S=params[3], I=I0, R=0) \Comment{Initial state vector}
+    \State nu $\gets$ matrix(c(-1,0,1,-1,0,1),nrow=3,byrow=T)
+    \Comment{State-change matrix}
+    \State a  $\gets$ c("beta*S*I", "gamma*I")  \Comment{Propensity vector}
+    \State tf $\gets$ time \Comment{Final time}
+    \State
+    \State \emph{\# Run the simulations}
+    \State nf $\gets$ layout(matrix(c(1,2,3,4),ncol=2,byrow=T))
+    \State
+    \State \emph{\# Direct method}
+    \State set.seed(i)
+    \State out $\gets$ ssa(x0,a,nu,parms,tf,method="ETL",tau=1,
+    simName,verbose=FALSE)
+    \State return out.data
+\EndFunction
+       
+ 
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{Solving Candidate Models}
+As we aim to find a model that best describes our data, the next
+consideration is the generation of model data that might fit our
+epidemic data. With a candidate set of model equations in mind,
+namely the \emph{SIR} model, and a set of candidate parameters (beta,
+gamma and S0), we solve the model ODEs to generate a series of
+discreate data. We can then assess how well this chosen model fits the
+epidemic data.
+
+When implementing the model fitting
+framework in \emph{R}, we utilise the \emph{ode} function from the
+\emph{deSolve} package to return sub-population values calculated from a
+given set of parameters, a set of ODEs and a desired time frame. A
+simple \emph{R} implementation of the \emph{SIR} is shown in
+Figure~\ref{fig:sirR}. In the C++ implementation, an ODE solving
+framework is written from scratch.
+
+\begin{algorithm}
+\label{fig::sirR}
+\captionof{figure}{Implementation of the Kermack-McKendrick SIR model}
+\begin{algorithmic}
+  \Function{closed.sir.model}{$time, data, parameters$}
+  \State S $\gets$ data[1]
+  \State I $\gets$ data[2]
+  \State R $\gets$ data[3]
+  \State
+  \State beta $\gets$ parameters[1]
+  \State gamma $\gets$ parameters[2]
+  \State
+  \State dS $\gets$ -beta*S*I
+  \State dI $\gets$ beta*S*I - gamma*I
+  \State dR $\gets$ gamma*I
+  \State
+  \State list(c(dS,dI,dR))
+  \EndFunction
+\end{algorithmic}
+\end{algorithm}
+  
+  
+With a model solving framework and a set of data that we wish to fit,
+one can begin to visualise how the model fitting process might take
+place. Even with completely unknown parameters, candidate models can
+be generated by choosing parameters that might fit the
+data. Figure~\ref{fig:sircurves} depicts how using various model
+parameters results in different
+shaped curves. 
+
+\begin{center}
+\begin{figure}[ht!]
+
+\includegraphics[width=15cm]{Rplot01.png}
+\caption{Graph demonstrating various levels of model fit}
+\label{sircurves}
+\end{figure}  
+\end{center}
+
+As a theoretical aside, it should be highlighted that the
+\emph{ode} function uses the LSODA integration method by default,
+based on FORTRAN code. The benefit of the LSODA method is that is
+automatically switches between stiff and non-stiff systems, and is
+very robust. However, in our C++ implementation, we provide a `from
+scratch' ODE solver using the Runge-Kutta method in an attempt to
+speed up the model fitting process. A theoretical introduction to ODE
+solving is provided in Box 4.  
+
+\newpage
+\begin{framed}
+{\begin{center}{\bf Box 3: Solving Ordinary Differential Equations}\end{center}}
+
+The epidemic models take the form of ordinary differential
+equations (ODEs), wherein the dynamics of the population are described by the
+transition of individuals between different compartments. In the case
+of the the \emph{SIR} model, individuals transition from susceptible,
+to infected and finally to recovered. As discussed in Box 1, the rate
+of transition between these states depends on the model parameters
+(namely beta and gamma), as well as the number of individuals
+currently in each compartment. 
+
+For the purpose of model fitting, it is necessary to calculate the
+number of individuals in each compartment at each time point. This
+requires the set of ODEs to be solved. Given a set of parameters and
+initial compartment sizes, we wish to find the number of individuals
+over the course of the epidemic at each time point. For a simple
+differential equation, it is possible to find the closed form
+solutions. Given a function, \emph{g}, we wish to find the solution
+such that:
+
+\begin{equation}
+\begin{split}
+  &Y'(t) = g(t)\\
+  &Y(t) = \int g(s)ds+c
+\end{split}
+\end{equation}
+
+where \emph{c} is an arbitrary constant, and the value of Y(t) can be
+obtained at a given time point: \begin{equation} Y(t_0) = Y_0 \end{equation}
+
+In the case of
+first-order differential equations (as is our case), we take the above
+equation as the initial value condition and are presented
+with an initial value problem of the form:\cite{atkinson} 
+
+\begin{equation}
+\begin{split}
+  &y'(t) = f(t,y(t)),\\
+  &y(t_0) = y0
+ \end{split}
+ \end{equation}
+
+It is often impractical to derive analytical solutions to
+differential equations. In the case of models in epidemiology, the
+first-order different equations are often
+non-integrable.\cite{shabbir} Considerable work has been undertaken to attempt to solve
+\emph{SIR} models analytically using Lie analysis and homotopy
+analysis.\cite{nucci, khan} Such approaches are difficult to implement
+and are not fit for the purpose quickly solving ODEs in a
+generalisable way. We therefore turn to numerical
+analysis.
+
+Numerical methods are used to find numerical approximations to the
+solutions of ODEs rather than solving them analytically. For the
+purpose of obtaining population values that can be used in model fit
+assessment, such numeric approximations are sufficient. The simplest
+numerical method for solving the initial value problem is \emph
+{Euler's method}, which involves finding an approximate nearby point
+on the curve by moving along a line tangent. Euler's method forms
+the basis for a highly popular group of
+methods for solving initial value problems known as Runge-Kutta
+methods, which are relatively easy to implement. 
+
+The most basic member of the Runge-Kutta methods is simply known as
+the ``classical Runge-Kutta method'', and is the method that we chose
+to implement in C++. Given the above initial value problem and an
+initial condition, we can attempt to find later values of y(t) with
+the following definitions:
+
+\begin{equation}
+\begin{split}
+  &y_{n+1} = y_n + \frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4)\\
+  &t_{n+1} = t_n + h
+ \end{split}
+\end{equation}
+for \emph{n} = 0, 1, 2, 3..., using
+\begin{equation}
+\begin{split}
+  &k_1 = f(t_n,y_n),\\
+  &k_2 = f(t_n + \frac{h}{2},y_n+ \frac{h}{2}k_1),\\
+  &k_3 = f(t_n + \frac{h}{2},y_n+ \frac{h}{2}k_1),\\
+  &k_4 = f(t_n+h,y_n+hk_3)
+\end{split}
+\end{equation}
+
+Note that $y_{n+1}$ is the Runge-Kutta approximation of $y(t_{n+1})$,
+where $y_{n+1}$ is determined by the weighted average of four
+increments of $y_n$ at interval size, \emph{h}, with the estimated
+slope specified by the right hand side of the differential
+equations. Note that greater weighting is given to the increments at
+the midpoint of the chosen interval.
+\end{framed}
+
+\section{Parameter Optimisation}
+We now have now clearly identified our problem and the
+means by which we can attempt to solve it. That is, can we find a set
+of ODE parameters that generate a model that accurately fits our epidemic
+data. Given an initial set of test parameters, we attempt to optimise
+these parameters to best fit our data using an optimisation algorithm
+alongside an objective function measuring model fit.
+
+\subsection{Initial Test Parameters}
+In classical epidemiology, it is often possible to obtain estimates of
+many important model parameters based on disease biology and
+population dynamics. For example, the initial susceptible population
+of an isolated influenza outbreak might be estimated as the school-aged
+population of a country. Similarly, the infection and recovery rates of a
+new strain of virus might be estimated based on phylogenetic relationships
+to previous viruses of known parameters.\cite{volz} Another potential method is to measure
+transmission rates in experimental populations, as demonstrated by
+Bouma et al., who estimated the transmission parameters of the H5N1
+avian influenza virus using a small number of birds in an experimental
+tranmission study.\cite{bouma} However, it is easy to imagine
+situations where parameter estimation might be infeasible. Estimating
+the susceptible population size for a viral \emph{YouTube} video, for
+example, might be difficult. Do we assume that the entire internet
+population is at risk of exposure, or will the video be limited to only
+certain internet communities? Such a scenario is not unimaginable for
+infectious diseases. Should a new, uncharacterised disease arise in
+only an unknown demographic, the task of estimating model parameters
+becomes very difficult.
+
+In scenarios where parameter estimation is infeasible, we aim to find
+the true model parameters without making any assumptions as to where
+they might lie other than within a realistic range. In the presented
+model fitting framework, we begin the parameter optimisation procedure
+with random parameter values taken from a realistic range with
+reasonable limitations imposed. For example, we seed the optimisation
+procedure with a random beta value between 0.0001 and 0.01. It is also
+important to ensure that a number of realistic conditions are adhered
+to:
+
+\begin{enumerate}
+  \item The basic reproductive ratio must be sufficient to allow an
+    epidemic to take off, $R0 > 1$. For this to be adhered to, gamma
+    must be greater than beta.
+  \item The initial number of susceptible individuals, $S_0$ must be
+    positive and within a reasonable range. Seeding with an
+    very high or low values might prevent the optimisation
+    procedure from converging on an optimal solution.
+  \item The initial number of infected individuals, $I_0$, must be
+    greater than 0. Whilst $I_0$ does not necessarily need to be bound
+   from above by $S_0$, it is generally the case that $S_0$ is
+   much greater than $I_0$. 
+\end{enumerate}
+
+One heuristic for estimating the start value of $I_0$ is to take the
+first data point as the initial number of infected
+individuals. However, this causes the model to be highly dependent on
+the first data point, neglecting to consider that the first data point
+might not represent the start of the epidemic. A more reasonable
+approach would be to consider $I_0$ as another unknown parameter to be
+optimised, or to assume that there is initially only one infected
+patient, or `patient zero'. In the case of online phenomena, an $I_0$
+of 1 may represent the initial posting of a video or meme. In the case
+of infectious disease dynamics, $I_0$ might need to be seeded
+higher. For example, multiple infecteds might enter a population
+simultaneously on the same flight. We initially make the assumption
+that $I_0$ is always 1, and then go on to adapt our
+implementation to include $I_0$ as an unknown parameter.
+
+
+\subsection{The Objective Function}
+With a set of model equations, potential model parameters and the
+resulting model data at each time point, the next step is to assess
+how well the proposed model fits the given data. It is only through
+quantifying this measurement that we can then go on to find the best
+fitting model parameters. As discussed in section BACKGROUND, the
+first assessment of fit that we implement is the least squares
+fit. This uses the total squared difference between each model
+value and dataset value at each time point. The smaller this `sum of
+squared errors' (SSE), the better the model fit. Clearly our aim is to find
+the set of parameters that minimises this SSE. A central part of the
+model fitting framework is therefore the implementation of this
+`objective function' (Figure XX). Once the objective function is
+defined, the final step in the optimisation procedure is to transform
+the model parameters until the SSE is minimised.
+
+\begin{algorithm}
+ \captionof{figure}{Least Squares Fitting Objective Function}
+\begin{algorithmic}
+  
+  \State \# Takes a set of parameters and a set of
+  epidemic data. The \emph{ode} function then uses the LSODA solver to
+  evaluate the \emph{SIR} model. The sum of squared
+  errors is then calculated from the generated model and provided data.
+  \State
+  \Function{sir.sse}{$params, data$}
+
+  \State t $\gets$ data[,1]
+  \State cases $\gets$ data[,2]
+  \State
+  \State beta $\gets$ params[1]
+  \State gamma $\gets$ params[2]
+  \State
+  \State S0 $\gets$ params[3]
+  \State I0 $\gets$ 1
+  \State R0 $\gets$ 0
+  \State
+  \State out $\gets$ as.data.frame(ode(y=c(S=S0,I=I0,R=R0),
+  times=t,closed.sir.model,parms=c(beta,gamma),
+  atol=1e-15,hmax=1/120))
+  \State sse $\gets$ sum((out\$I-cases)\^2)
+  \EndFunction
+ \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Optimisation Algorithm}
+The next step in the model fitting framework is an implementation of
+an optimisation procedure to find the set of parameters that minimise
+the result of the objective function. In the initial \emph{R}
+implementation, this is done by passing the initial seed parameters,
+the objective function and the data to the \emph{optim}
+function. \emph{Optim} uses the Nelder-Mead algorithm to find the set
+of parameters in the parameter space that return the minimum objective
+function value. That is, the set of parameters that evaluate to a
+model that most closely fits the provided data. Box 4 provides a
+theoretical overview of the Nelder-Mead algorithm. 
+
+The \emph{optim} function also provides the option to use other optimisation methods,
+including the ``BFGS'' quasi-Newton method, the ``CG'' conjugate
+gradients method and the ``L-BFGS-B'' method. However, we settle on the
+Nelder-Mead due to its robustness, and in the case of C++, its ease of
+implementation. 
+
+
+- Discuss the C++ implementation of Nelder-Mead, namely how we adapted
+ a primitive implementation to allow for an object of any class and a pointer to
+ any function can be passed along with a vector of any class
+ parameters.
+- Discuss the importance of iterations and error tolerance
+
+Figure XX illustrates the results of running \emph{optim} on a
+\emph{GillespieSSA} generated model with known parameters.
+
+\begin{centering}
+\begin{figure}
+\includegraphics[width=15cm]{simplefit.png}
+\caption{The Gillespie algorithm is run with original parameter values of $\beta =
+  0.001, \gamma = 0.1, S_0 = 500$. The \emph{optim} function returns
+  fitted parameter values of $\beta = 0.0008018066, \gamma = 0.1273486, S_0
+  = 618$. This results in a SSE of 5120.06.}
+\end{figure}
+\end{centering}
+
+
+
+\newpage
+\begin{framed}
+{\begin{center}{\bf Box 4: The Nelder-Mead Algorithm}\end{center}}
+The Nelder-Mead algorithm, or simplex search algorithm, is one of the
+best known and commonly used algorithms for multidimensional
+unconstrained optimisation without derivatives. The algorithm is
+relatively simple to understand and implement, which makes it an ideal
+candidate for solving parameter estimation problems. The method
+ultimately approximates a local optimum of a problem with $N$
+variables when provided with an objective function to be minimised.
+
+Given a nonlinear function, $f : {\mathbb
+  R}^n \to {\mathbb R}\ .$, the Nelder-Mead algorithm uses a
+simplex-based search method to minimise $f$, where a simplex, $S$
+in ${\mathbb R}^n$ is defined as the convex hull of $n + 1$ vertices,
+$x_0,...,x_n \in {\mathbb R}^n$. In the case of ${\mathbb R}^2$, the
+simplex is a triangle, whereas in the case of ${\mathbb R}^3$, the
+simplex is a tetrahedron. In the case of epidemic model fitting, each
+vertex of the simplex corresponds to a set of model parameters.
+
+Starting with a set of $n+1$ points (the initial `seed' parameters)
+and a corresponding set of function values at the vertices, $f_i :=
+f(x_i),$ for $j = 0,...,n$, the Nelder-Mead method performs a sequence
+of transformations on the working simplex S with the aim of decreasing
+the function values at its vertices. Once the method has satisfied
+some minimisation condition, whether it be a number of steps or a
+desired minimisation range, the final simplex can be used to return
+the optimised parameters.
+
+The Nelder-Mead algorithm follows the following set of
+steps:
+
+\begin{enumerate}
+\item Construction of the initial working simplex, $S$, around an initial
+  point based on initial parameters
+\item Repeat the following steps until maximum number of iterations
+  reached or minimisation condition satisfied:
+  \begin{enumerate}
+  \item Calculate the function value for the current working simplex
+  \item Check if terminiation criteria met
+  \item If not met, transform towards the best vertex of the working simplex to give new
+    vertex values with the following sub steps:
+    \begin{enumerate}
+      \item Determine the order of vertices in terms of function
+        values (from best to worst)
+        \item Calculate the centroid, $c$ of the side opposite the
+          worst vertex
+\item Compute a new working simplex from the current simplex using a
+  series of transformations
+\end{enumerate}
+  \end{enumerate}
+\item Return the best vertex of the current simplex, S, along with
+  its associated function value.
+\end{enumerate}
+
+In the transformation step, replacing the worst vertex is achieved by reflection, expansion or contraction with respect to the best
+side. Firstly, the worst vertex is replaced with a reflection of the
+best vertex. If this point provides an improvement on the current best
+value, then the simplex is expanded towards the new point. Otherwise,
+the simplex is contracted towards the current best point.If
+successful, then the new point replaces the worst vertex of the
+working simplex. If not, then the simplex is shrunk towards the best
+vertex. A later addition of the algorithm is to shrink the entire
+simplex in the event of failed contractions, though this is a rare and
+slow step.
+
+\begin{center}
+  \includegraphics[width=15cm]{nelder.png}
+  \captionof{figure}{A) Reflection. B) Exansion. C) Outside
+    contraction. D) Inside contraction. E) Shrink transformation}
+\end{center}
+
+The Nelder-Mead method is a fast and relatively simple
+algorithm for obtaining a good reduction in function value in a
+relatively small number of function evaluations. For optimisation
+problems where a precise optimum (eg. parameters are subject to noise)
+is not necessarily required, the Nelder-Mead method is ideal. However, it is possible for the
+Nelder-Mead algorithm to undertake an extremely high number of
+iterations with little to no function value improvement at a region
+far from the actual minimum. A heuristic solution to this problem is
+to restart the algorithm at multiple start points and to only allow a
+small number of iterations during each run.\cite{nelder,singer}
+ 
+\end{framed}
+
+
+\subsection{Parameter Transformations}
+
+
+
+\section{Evaluating Goodness of Fit}
+Although the SSE provides a value which the optimisation process can
+aim to minimise, it's magnitude is largely meaningless without
+appropriate context. We therefore use the coefficient of
+determination, $R^2$, to provide an evaluation of model fit. $R^2$ is
+a widely used measure of goodness of fit in statistical modelling, and
+provides an ideal means for comparison between different model
+fits. $R^2$ provides a measure of what proportion of total variation
+in the data is explained by the model. A mathematical definition of
+the $R^2$ measure is provided in Box 5.
+
+\newpage
+\begin{framed}
+{\begin{center}{\bf Box 4}\end{center}}
+{\bf The Coefficient of Determiniation}:\\
+
+Consider a data set with observed values $y_i$. We would like to assess how
+well a set of predicted values $f_i$ fits our data. Firstly, we
+consider the amount of variability in our data set using the sum of
+squares:
+
+\begin{equation}
+  SS_{tot} = \sum\limits_{i}(y_i - \bar{y})^2
+\end{equation}
+
+Where $\bar{y}$ denotes the mean of the observed:
+
+\begin{equation}
+  \bar{y} = \frac{1}{n}\sum\limits_{i=1}^n(y_i)
+\end{equation}
+
+Next, we calculate the sum of squares of the residuals. That is, the
+amount of discrepancy between the data and the predicted values:
+
+\begin{equation}
+SS_{res} = \sum\limits_{i}(y_i - f_i)^2
+\end{equation}
+
+The final step is then to evaluate the amount of unexplained variance of
+the model with the total variance of the data. This gives us the
+\emph{coefficient of determination}, $R^2$:
+
+\begin{equation}
+  R^2 \equiv 1 - \frac{SS_{res}}{SS_{tot}}
+\end{equation}
+
+The resulting value is usually a number between 0 and 1, where 1
+suggests that the predicted values explain all of the variance of the
+data (a perfect fit), and a value close to 0 implies that it explains
+very little of the data
+variance (a poor fit). Values of less than 0 are also possible, which indicates
+that the mean of the data provides a better model fit than the model.
+
+\end{framed}
+
+\section{Iterative Least Squares Fitting Framework}
+\subsection{R Implementation}
+Due to the availibility of relevant packages and its suitability for
+data manipulation, the initial fitting framework was implemented in
+R. The flow of control of the basic implementation is depicted in
+Figure XX. The framework takes a matrix or data frame of epidemic data
+to be fit and begins the optimisation procedure. Random seed
+parameters are generated and given to the optimisation function,
+\emph{optim}, along with the objective function to be minimised. As
+the Nelder-Mead algorithm can converge on sub-optimal solutions due to
+the presence of local minima, the optimisation function is restarted
+twenty times with different seed parameters. The best fitting set of
+parameters are stored and passed to the analysis procedure, which
+evaluates the model for the given parameters and calculates the
+accompanying R-Square value. Finally, all of the results are passed to
+the output procedure for graph plotting and results saving.  
+
+\begin{centering}
+\begin{figure}[ht!]
+  \includegraphics[width=15cm]{process1.png}
+ \caption{Control flow of the basic model fitting framework} 
+\end{figure}
+\end{centering}
+
+To begin with, the optimisation procedure only considers beta and
+gamma to be unknown. The other important model parameters, S0, I0 and
+R0 are set to the correct values. We then adapt the framework to also
+consider S0 to be a completely unknown parameter. Figure XX shows how the optimisation
+procedure unfolds over time. The framework fits the available data
+points well early on; however, it does not accurately predict the main
+peak until sufficient data has become available. By the 40th data
+point, a very high R-Square value is achieved, with parameters that
+closely match the ground truth parameters (beta=0.00111, gamma=0.0946,
+S0=506). The inclusion of S0 as an additional unknown parameter allows
+a closer model fit to be calculated.
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/sirs0_5.jpeg}
+  \includegraphics[width=8cm]{images/sirs0_10.jpeg}
+  \includegraphics[width=8cm]{images/sirs0_18.jpeg}
+  \includegraphics[width=8cm]{images/sirs0_40.jpeg}
+\caption{Iterative model fitting over time using least squares minimisation.}
+  \end{figure}
+\end{centering}
+
+The model fitting procedure can be extended further to include the
+start time of the epidemic, t0, and the number of initial infected
+individuals, I0. Data from real epidemic phenomena might not become
+available until well into the start of the epidemic, and the start
+time and number of initial infected individuals might not immediately
+be available. By including t0 and I0 in the optimisation procedure, we
+are able to predict the dynamics of the epidemic as soon as it is
+detected. However, including additional unknown parameters in the
+optimisation procedure results in a much more unstable fitting
+process.  
