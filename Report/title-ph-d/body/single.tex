@@ -22,7 +22,7 @@ infected individuals over time. In this context, the term `infected individuals'
 defined as individuals infected with a disease, or individuals that
 have viewed a particular \emph{YouTube} video or `liked' a particular
 \emph{Facebook} post. Examples of this type of data are shown in
-Figure XX. \emph{R} is ideally suited for the easy management and
+Figure~\ref{figure:examples}. \emph{R} is ideally suited for the easy management and
 manipulation of data through the use of the `data frame' type. In C++,
 we import data as .csv files and carry out all manipulation and use
 using vectors.
@@ -35,6 +35,7 @@ using vectors.
 \caption{Example synthetic epidemic data generated using the
   \emph{GillespieSSA} algorithm in \emph{R}. In this model: $beta =
   0.0015, gamma = 0.1, S0 = 800, I0 = 1$.}
+\label{figure:examples}
 \end{figure}  
 \end{center}
 
@@ -69,7 +70,7 @@ SIR model in R using \emph{GillespieSSA} for generation of synthetic data.
     simName,verbose=FALSE)
     \State return out.data
 \EndFunction
-       
+\label{algorithm:gillespie}      
  
 \end{algorithmic}
 \end{algorithm}
@@ -93,7 +94,7 @@ Figure~\ref{fig:sirR}. In the C++ implementation, an ODE solving
 framework is written from scratch.
 
 \begin{algorithm}
-\label{fig::sirR}
+\label{fig:sirR}
 \captionof{figure}{Implementation of the Kermack-McKendrick SIR model}
 \begin{algorithmic}
   \Function{closed.sir.model}{$time, data, parameters$}
@@ -127,7 +128,7 @@ shaped curves.
 
 \includegraphics[width=15cm]{Rplot01.png}
 \caption{Graph demonstrating various levels of model fit}
-\label{sircurves}
+\label{fig:sircurves}
 \end{figure}  
 \end{center}
 
@@ -142,7 +143,7 @@ solving is provided in Box 4.
 
 \newpage
 \begin{framed}
-{\begin{center}{\bf Box 3: Solving Ordinary Differential Equations}\end{center}}
+{\begin{center}{\bf Box 4: Solving Ordinary Differential Equations}\end{center}}
 
 The epidemic models take the form of ordinary differential
 equations (ODEs), wherein the dynamics of the population are described by the
@@ -316,7 +317,7 @@ value and dataset value at each time point. The smaller this `sum of
 squared errors' (SSE), the better the model fit. Clearly our aim is to find
 the set of parameters that minimises this SSE. A central part of the
 model fitting framework is therefore the implementation of this
-`objective function' (Figure XX). Once the objective function is
+`objective function' (Figure~\ref{algorithm:objective}). Once the objective function is
 defined, the final step in the optimisation procedure is to transform
 the model parameters until the SSE is minimised.
 
@@ -347,6 +348,7 @@ the model parameters until the SSE is minimised.
   \State sse $\gets$ sum((out\$I-cases)\^2)
   \EndFunction
  \end{algorithmic}
+\label{algorithm:objective}
 \end{algorithm}
 
 
@@ -368,14 +370,7 @@ gradients method and the ``L-BFGS-B'' method. However, we settle on the
 Nelder-Mead due to its robustness, and in the case of C++, its ease of
 implementation. 
 
-
-- Discuss the C++ implementation of Nelder-Mead, namely how we adapted
- a primitive implementation to allow for an object of any class and a pointer to
- any function can be passed along with a vector of any class
- parameters.
-- Discuss the importance of iterations and error tolerance
-
-Figure XX illustrates the results of running \emph{optim} on a
+Figure~\ref{fig:simple}  illustrates the results of running \emph{optim} on a
 \emph{GillespieSSA} generated model with known parameters.
 
 \begin{centering}
@@ -385,6 +380,7 @@ Figure XX illustrates the results of running \emph{optim} on a
   0.001, \gamma = 0.1, S_0 = 500$. The \emph{optim} function returns
   fitted parameter values of $\beta = 0.0008018066, \gamma = 0.1273486, S_0
   = 618$. This results in a SSE of 5120.06.}
+\label{fig:simple}
 \end{figure}
 \end{centering}
 
@@ -392,7 +388,7 @@ Figure XX illustrates the results of running \emph{optim} on a
 
 \newpage
 \begin{framed}
-{\begin{center}{\bf Box 4: The Nelder-Mead Algorithm}\end{center}}
+{\begin{center}{\bf Box 5: The Nelder-Mead Algorithm}\end{center}}
 The Nelder-Mead algorithm, or simplex search algorithm, is one of the
 best known and commonly used algorithms for multidimensional
 unconstrained optimisation without derivatives. The algorithm is
@@ -493,7 +489,7 @@ the $R^2$ measure is provided in Box 5.
 
 \newpage
 \begin{framed}
-{\begin{center}{\bf Box 4}\end{center}}
+{\begin{center}{\bf Box 6}\end{center}}
 {\bf The Coefficient of Determiniation}:\\
 
 Consider a data set with observed values $y_i$. We would like to assess how
@@ -540,7 +536,7 @@ that the mean of the data provides a better model fit than the model.
 Due to the availibility of relevant packages and its suitability for
 data manipulation, the initial fitting framework was implemented in
 R. The flow of control of the basic implementation is depicted in
-Figure XX. The framework takes a matrix or data frame of epidemic data
+Figure~\ref{process}. The framework takes a matrix or data frame of epidemic data
 to be fit and begins the optimisation procedure. Random seed
 parameters are generated and given to the optimisation function,
 \emph{optim}, along with the objective function to be minimised. As
@@ -554,15 +550,16 @@ the output procedure for graph plotting and results saving.
 
 \begin{centering}
 \begin{figure}[ht!]
-  \includegraphics[width=15cm]{process1.png}
+  \includegraphics[width=15cm]{images/process.png}
  \caption{Control flow of the basic model fitting framework} 
+\label{fig:process}
 \end{figure}
 \end{centering}
 
 To begin with, the optimisation procedure only considers beta and
 gamma to be unknown. The other important model parameters, S0, I0 and
 R0 are set to the correct values. We then adapt the framework to also
-consider S0 to be a completely unknown parameter. Figure XX shows how the optimisation
+consider S0 to be a completely unknown parameter. Figure~\ref{fig:sir} shows how the optimisation
 procedure unfolds over time. The framework fits the available data
 points well early on; however, it does not accurately predict the main
 peak until sufficient data has become available. By the 40th data
@@ -577,17 +574,242 @@ a closer model fit to be calculated.
   \includegraphics[width=8cm]{images/sirs0_10.jpeg}
   \includegraphics[width=8cm]{images/sirs0_18.jpeg}
   \includegraphics[width=8cm]{images/sirs0_40.jpeg}
-\caption{Iterative model fitting over time using least squares minimisation.}
+\caption{Iterative model fitting over time using least squares
+  minimisation.}
+\label{fig:sir}
   \end{figure}
 \end{centering}
 
 The model fitting procedure can be extended further to include the
-start time of the epidemic, t0, and the number of initial infected
-individuals, I0. Data from real epidemic phenomena might not become
-available until well into the start of the epidemic, and the start
-time and number of initial infected individuals might not immediately
-be available. By including t0 and I0 in the optimisation procedure, we
+number of initial infected individuals, I0. Data from real epidemic
+phenomena might not become available until well into the start of the epidemic, and number of initial infected individuals might not immediately
+be available. For example, consider a \emph{YouTube} video where views
+data are not collected until the video has already become viral. By
+including I0 in the optimisation procedure, we
 are able to predict the dynamics of the epidemic as soon as it is
-detected. However, including additional unknown parameters in the
-optimisation procedure results in a much more unstable fitting
-process.  
+detected. Including additional unknown parameters in the
+optimisation procedure provides a closer model fit but runs the risk
+of increase instability during optimisation as parameter
+transformations have a greater impact on the objective
+function. Figure~\ref{fig:siri0} shows the run of the optimisation procedure where
+beta, gamma, S0 and I0 are all assumed to be unknown. Although the
+fits seem comparable to Figure~\ref{fig:sir}, Figure~\ref{fig:siri0wrong} demonstrates how the
+goodness of model fit is reduced when our initial assumptions about I0
+are incorrect.
+
+\begin{centering}
+\begin{figure}
+\includegraphics[width=8cm]{images/siri0_5}
+\includegraphics[width=8cm]{images/siri0_10}
+\includegraphics[width=8cm]{images/siri0_20}
+\includegraphics[width=8cm]{images/siri0_40}
+\caption{Iterative model fitting over time using least squares
+  minimisation. I0, S0, beta and gamma unknown.}
+\label{fig:siri0}
+\end{figure}
+\end{centering}
+
+
+\begin{figure}
+  \centering
+\includegraphics[width=10cm]{images/siri0_unknown}
+\caption{Goodness of fit reduced when inaccurate parameter assumptions
+  are made.}
+
+\label{fig:siri0wrong}
+\end{figure}
+
+\subsection{C++ Implementation}
+Although the implementation in R provides a simple and relatively quick
+fitting framework, it depends heavily on independently provided
+packages. By implementing the fitting framework from scratch, we are
+able to address any potential bottlenecks to performance. Furthermore,
+it has been found that C++ is much faster than R in modelling
+tasks.\cite{languagespeeds} On the flip
+side, the lack of available methods imposes a significant cost in
+terms of coding time on the project. A significant contribution of this project
+is the implementation of model fitting framework from scratch using a
+generalisable, objected oriented approach, allowing for the easy
+addition of candidate epidemic models. Figure~\ref{fig:uml}  depicts a simplified
+UML diagram of the object oriented model fitting framework.
+
+
+\begin{figure}
+  \centering
+ \includegraphics[width=15cm]{images/uml}
+\caption{UML diagram of the model fitting framework}
+\label{fig:uml}
+\end{figure}
+
+The Datahandler class keeps track of the currently available data,
+best fitting parameters, current model and currently active
+epidemics. The fitting procedure is initiated with a desired fit
+level, and the Datahandler proceeds to manage the overall fitting
+process. An objective function is formed by solving and summing the
+ODEs for each active epidemic, and calculating the SSE against the
+available epidemic data. This objective function is passed to the
+Simplex class, which carries out the Nelder-Mead algorithm to return
+an optimised set of parameters. Note that the Epidemic class is an
+abstract class, with each sub class having its own set of parameters
+and set of ODEs. The Epidemic class also holds the Runge Kutta method
+for solving a given set of ODEs. This allows the framework to be easily extendible to
+include additional types of candidate model. The Datahandler class
+also manages the analysis of model fit and the plotting of any desired
+graphs through the use of Gnuplot. Figure~\ref{fig:sirc} shows the output of the
+iterative fitting procedure on synthetic data, where beta, gamma and
+S0 are assumed to be unknown.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=8cm]{images/output5}
+  \includegraphics[width=8cm]{images/output10}
+  \includegraphics[width=8cm]{images/output20}
+  \includegraphics[width=8cm]{images/output40}
+\caption{Graphical output of the C++ single model fitting
+  framework. Beta = 0.001, gamma = 0.1, S0 = 1000, I0 = 1}
+\label{fig:sirc}
+\end{figure}
+
+
+\section{Alernative Candidate Models}
+
+The generalised C++ implementation allows for alternative candidate
+models to be fit to our epidemic data. In classical epidemiology, many
+infectious diseases are better explained by adaptations of the
+\emph{SIR} model. For example, The HIV virus is best explained by the
+\emph{SIS} model, where infected individuals do not recover but rather
+return to the susceptible compartment.\cite{vynnycky} Similarly, some online epidemic
+phenomena have been shown to be better described by an adaptation of
+the \emph{SIR} model known as the \emph{irSIR} model, which suggests
+that the recovery rate is additionally dependent on the number of
+recovered individuals (as themes become `out of
+fashion').\cite{cannarella} As discussed in section BACKGROUND, it has
+also recently been proposed that online viral trends might spread as either gradual
+``growth'' or sudden ``spike'' epidemics, depending on whether the
+trend is spread slowly through social networks, or rapidly through
+mass exposure. An improved model fitting framework would
+therefore allow for the selection of a best fitting candidate model
+from a list of potential models.
+
+\subsection{Additional Models}
+The present fitting framework considers the SIR and SEIR as initially described
+in classical epidemiology.\cite{vynnycky} We also include the Exponential Decay model
+to represent a ``spike'' epidemic and the irSIR mdoel as proposed by
+Cannarella et al.\cite{cannarella} Furthermore, we propose a novel
+adaptation of the SEIR model named the SErIR model. In this model, we
+consider the number of exposed individuals rather than the number of
+infected individuals as our population of interest. The rationale
+behind this is that in
+online phenomena, an individual is recorded as having seen or viewed a
+video regardless of whether or not they are actively spreading the
+epidemic. Furthermore, this model adds an additional parameters,
+$\pi$, which represents the rate at which individuals who are exposed
+to the `infection' move to the recovered compartment without spreading the infection.
+
+\begin{figure}
+\centering
+\includegraphics[width=16cm]{images/models}
+\caption{1) SIR model. 2) SEIR model. 3) Exponential decay model. 4)
+  Modified SErIR model. 5) irSIR model}
+\end{figure}
+
+\newpage
+\begin{framed}
+{\begin{center}{\bf Box 5: Candidate Epidemic Models}\end{center}}
+In addition to the \emph{SIR} and \emph{Exponential Decay Model}
+described in Box 2, we include the following epidemic models in our
+fitting framework:
+
+{\bf The irSIR Model}\\
+Originally proposed by Cannarella et al., the \emph{irSIR}
+model is an adaptation of the \emph{SIR} model to consider that the
+rate of recovery depends on the number of recovered
+individuals. The classic \emph{SIR} model considers that infected
+individuals recover with a set rate, $\gamma$ as they fight off the
+infection. The idea behind the irSIR model is that an individual is
+more likely to recover from an infection if they come into contact
+with an already recovered individual. For example, Cannarella et
+al. suggest that individuals are more likely to stop using a social
+network site as overall usage decreases. The \emph{irSIR} model has the following parameter vector and set of
+equations:
+\begin{equation}
+\centering \theta^{(i)} = [I_0^{(i)},
+  S_0^{(i)}, \beta^{(i)}, \gamma^{(i)}]
+\end{equation}
+\begin{centering}
+\begin{equation}
+	\begin{split}
+	&\frac{dS}{dt} = -\beta IS, \\
+	&\frac{dI}{dt} = \beta IS - \gamma IR, \\
+	&\frac{dR}{dt} = \gamma IR
+	\end{split}
+\end{equation}
+\end{centering}\\
+{\bf The SEIR Model}\\
+The \emph{SEIR} is another simple adaptation of the \emph{SIR} model
+that aims to better describe the course of a disease. Rather than
+transitioning from susceptible to infected immediately, many diseases
+go through a long incubation period before the infected individual
+becomes infectious.\cite{aron} This incubation period is described by
+the parameter $\alpha$, where $1/\alpha$ is the mean latent period of
+the disease. The \emph{SEIR} model has the following parameter vector
+and set of equations:
+\begin{equation}\centering\theta^{(i)} = [I_0^{(i)},
+  S_0^{(i)}, \beta^{(i)}, \alpha^{(i)}, \gamma^{(i)}]\end{equation} 
+\newpage
+\begin{centering}
+\begin{equation}
+	\begin{split}
+	&\frac{dS}{dt} = -\beta IS, \\
+        &\frac{dE}{dt} = \beta IS - \alpha E, \\
+	&\frac{dI}{dt} = \alpha E - \gamma IR, \\
+	&\frac{dR}{dt} = \gamma IR
+	\end{split}
+\end{equation}
+\end{centering}\\
+{\bf The SErIR Model}\\
+A novel candidate model proposed here is the \emph{SErIR} model; an
+adaptation of the SEIR model that takes into account incomplete infection
+spreading. Whereas individuals affected by an infectious disease will
+invariably spread the infection upon contact, individuals that are
+exposed to online viral phenomena might not go on to become
+spreaders. Furthermore, the measure interest becomes the `exposed'
+rather than `infected' compartment, as non-spreaders will contribute
+towards the data of interest. Consider the example where an individual
+views a \emph{YouTube} video, but does not go on to `share' the link
+with anyone else. We introduce the parameter, $\pi$ to describe the
+rate at which individuals move from the exposed to the recovered
+compartment, where $1/\pi$ might be termed the ``ignoral rate''. The
+\emph{SErIR} model has the following parameter vector and set of
+equations:
+\begin{equation}\centering\theta^{(i)} = [I_0^{(i)},
+  S_0^{(i)}, \beta^{(i)}, \alpha^{(i)}, \pi^{(i)}, \gamma^{(i)}]\end{equation} 
+\begin{centering}
+\begin{equation}
+	\begin{split}
+	&\frac{dS}{dt} = -\beta IS, \\
+        &\frac{dE}{dt} = \beta IS - (\alpha + \pi)E, \\
+	&\frac{dI}{dt} = \alpha E - \gamma IR, \\
+	&\frac{dR}{dt} = \gamma IR + \pi E
+	\end{split}
+\end{equation}
+\end{centering}
+
+\end{framed}
+
+Figure~\ref{figure:candidates} shows the trajectories of the various
+candidate models when seeded with similar parameters. As individuals
+move out of the compartment of interest at a greater rate (namely in
+the \emph{irSIR} model), the peak becomes much lower. Furthermore, the
+introduction of an incubation period as in the \emph{SEIR} and
+\emph{SErIR} models delays the peak of the epidemic.
+
+\begin{figure}
+\centering
+\includegraphics[width=16cm]{images/candidates}
+\caption{Dynamics of candidate models with similar parameters and
+  starting susceptible population of 1000}
+\label{figure:candidates}
+\end{figure}
+
+\subsection{Implentation}

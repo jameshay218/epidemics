@@ -72,11 +72,17 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
   candidateModels.push_back(irsir);
   candidateModels.push_back(seir);
  
+  // Start off with a baseline model of the mean of the first 4 points
+  for(unsigned int j = 0; j <= 4; ++j){
+    this->temp_data.push_back(this->current_data[j]);
+  }
+  this->baseModel = this->current_model = base_model(this->temp_data);
+
 
   if(_epi != none) epidemics.push_back(new_epidemic(_epi,1,1.0));
  
   finalParams = tempPar = generate_seed_parameters();
-  for(unsigned int i = 90;i<this->current_data.size();++i){
+  for(unsigned int i = 5;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
@@ -170,7 +176,7 @@ double Handler::optimise_single(vector<double> &parameters, vector<vector<double
   }
   results = ode_solve(parameters);
   allResults = ode_solve_separate(parameters);
-  allResults.push_back(results);
+  //allResults.clear();
   cout << endl;
   return SSE;
 }
@@ -967,45 +973,54 @@ void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vect
   
   Gnuplot gp;   // Need instance of the Gnuplot class to pipe commands to gnuplot
   string name = "graphs1/output"; // The save location and general name of the graph to be saved
-  string _index = to_string(index);
+  string _index = to_string((index-1));
   string label, xlab;
+  string colours[5] = {"orange","yellow","cyan","darkblue","violet"};
   int j = 0;
 
-  xlab = "RSquare: " + to_string(_RSquare);  // Xlabel is the RSquare value
-  name = name + _index + ".jpeg";  // Graph name
+  xlab = "RSquare: " + to_string(_RSquare) + ". Run number: " + _index;  // Xlabel is the RSquare value
+  name = name + _index + ".png";  // Graph name
 
-  gp << "set terminal jpeg size 1000,800 enhanced font \"Helvetica, 10\"\n";    // Here edits type, size and formatting of graph
+  gp << "set terminal png size 1000,800 enhanced font \"Helvetica, 12\"\n";    // Here edits type, size and formatting of graph
   gp << "set xlabel '" << xlab << "'\n";
   gp << "set output '" << name << "'\n";  // Set output to the specified file name
   gp << "set termoption dash\n"; // Allow dashes
-
-  // Firstly, plot the actual data (3rd column)
-  gp << "plot '-' using 1:2 with linespoints lt 19 title 'Data'";
+  gp << "set style rect fc lt -1 fs solid 0.15 noborder \n";
   
-  // Secondly, plot the overall model values
-  gp << ", '-' using 1:2 with lines lw 1 title 'Total'";
+  gp << "set obj rect from 0, graph 0 to " + _index + ", graph 1\n";
+  // Firstly, plot the actual data (3rd column)
+  gp << "plot '-' using 1:2 with linespoints lw 2 lt 19 title 'Future Data'";
+  gp << ", '-' using 1:2 with linespoints lw 2 lt 19 linecolor rgb \"brown\" title 'Current Data'";
+  
   
   // For each sub epidemic, add a dashed line to the graph and a corresponding label to the key
-  label = "Baseline Level";
-  gp << ", '-' using 1:2 with lines lt 0 lc " << 0 << " title '" << label << "'";
+  if(finalResults.size() > 1){
+    label = "Baseline Level";
+    gp << ", '-' using 1:2 with lines lw 2 lt 0 lc " << 0 << " title '" << label << "'";
+  }
  
 
   for(int f = 0;f<(int)epidemics.size();++f){
     // Create the label depending on the type of epidemic
     label = "Sub-Epidemic " + to_string(f+1);
     label += create_label(epidemics[f], parameters, j);
-    gp << ", '-' using 1:2 with lines lt 0 lc " << f << " title '" << label << "'";
+    gp << ", '-' using 1:2 with lines lw 2 lt 0 linecolor rgb \"" << colours[f] << "\" title '" << label << "'";
   }
 
+  // Secondly, plot the overall model values
+  gp << ", '-' using 1:2 with lines lw 3 linecolor rgb \"green\" title 'Total'";
+  
 
   gp << "\n";
   
   // Send the data to Gnuplot
+ 
+  gp.send1d(current_data);
   gp.send1d(data);
-  gp.send1d(totalResults);
   for(unsigned int j = 0;j<finalResults.size();++j){
     gp.send1d(finalResults[j]);
   }
+  gp.send1d(totalResults);
 }
 
 string Handler::create_label(Epidemic* epi, vector<double> par1, int& i){

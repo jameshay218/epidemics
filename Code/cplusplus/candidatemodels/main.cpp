@@ -45,7 +45,7 @@ EpiType convert_to_epi_type(int epi){
 
 int main() {
   Handler dataHandler;
-  EpiType epiType;
+  EpiType epiType = sir;
   vector<vector<double> > finalResults;
   vector<double> finalParams;
   char file[80], saveLocation[80];
