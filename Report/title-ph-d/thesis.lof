@@ -13,14 +13,14 @@
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Least Squares Fitting Objective Function\relax }}{36}
 \contentsline {figure}{\numberline {3.6}{\ignorespaces The Gillespie algorithm is run with original parameter values of $\beta = 0.001, \gamma = 0.1, S_0 = 500$. The \emph {optim} function returns fitted parameter values of $\beta = 0.0008018066, \gamma = 0.1273486, S_0 = 618$. This results in a SSE of 5120.06.\relax }}{37}
 \contentsline {figure}{\numberline {3.7}{\ignorespaces A) Reflection. B) Exansion. C) Outside contraction. D) Inside contraction. E) Shrink transformation\relax }}{39}
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Control flow of the basic model fitting framework\relax }}{42}
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Iterative model fitting over time using least squares minimisation.\relax }}{43}
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Iterative model fitting over time using least squares minimisation. I0, S0, beta and gamma unknown.\relax }}{44}
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Goodness of fit reduced when inaccurate parameter assumptions are made.\relax }}{44}
-\contentsline {figure}{\numberline {3.12}{\ignorespaces UML diagram of the model fitting framework\relax }}{45}
-\contentsline {figure}{\numberline {3.13}{\ignorespaces Graphical output of the C++ single model fitting framework. Beta = 0.001, gamma = 0.1, S0 = 1000, I0 = 1\relax }}{46}
-\contentsline {figure}{\numberline {3.14}{\ignorespaces 1) SIR model. 2) SEIR model. 3) Exponential decay model. 4) Modified SErIR model. 5) irSIR model\relax }}{48}
-\contentsline {figure}{\numberline {3.15}{\ignorespaces Dynamics of candidate models with similar parameters and starting susceptible population of 1000\relax }}{51}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Control flow of the basic model fitting framework\relax }}{43}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Iterative model fitting over time using least squares minimisation.\relax }}{44}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Iterative model fitting over time using least squares minimisation. I0, S0, beta and gamma unknown.\relax }}{45}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Goodness of fit reduced when inaccurate parameter assumptions are made.\relax }}{45}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces UML diagram of the model fitting framework\relax }}{46}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Graphical output of the C++ single model fitting framework. Beta = 0.001, gamma = 0.1, S0 = 1000, I0 = 1\relax }}{47}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces 1) SIR model. 2) SEIR model. 3) Exponential decay model. 4) Modified SErIR model. 5) irSIR model\relax }}{49}
+\contentsline {figure}{\numberline {3.15}{\ignorespaces Dynamics of candidate models with similar parameters and starting susceptible population of 1000\relax }}{52}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

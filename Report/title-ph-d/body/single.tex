@@ -462,7 +462,8 @@ The Nelder-Mead method is a fast and relatively simple
 algorithm for obtaining a good reduction in function value in a
 relatively small number of function evaluations. For optimisation
 problems where a precise optimum (eg. parameters are subject to noise)
-is not necessarily required, the Nelder-Mead method is ideal. However, it is possible for the
+is not necessarily required, the Nelder-Mead method is ideal. However,
+it i s possible for the
 Nelder-Mead algorithm to undertake an extremely high number of
 iterations with little to no function value improvement at a region
 far from the actual minimum. A heuristic solution to this problem is
@@ -472,8 +473,76 @@ small number of iterations during each run.\cite{nelder,singer}
 \end{framed}
 
 
-\subsection{Parameter Transformations}
+\subsection{Parameter Transformations and Bounding}
+When left unmodified, the Nelder-Mead algorithm will search the parameter
+space in the range of $-\infty$ to $+\infty$. However, in the context
+of epidemic modelling, it does not make sense to consider negative
+parameters. By doing so, we increase the chance of the algorithm
+getting stuck in a local minimum and therefore returning infeasible results. We therefore carry out a \emph{log transformation} on each
+parameter, only carrying out the reverse \emph{exp} transformation
+within the objective function. This constrains the search space to
+between $0$ and $+\infty$, ensuring that we do not generate
+meaningless parameter vectors. 
 
+Another potential transformation that may be applied is through the
+use of the \emph{logistic} function. Originally studied in the context
+of population growth, maps the parameter search space from between $0$ and $1$
+to between $-\infty$ and $+\infty$. The function is
+defined as:
+\begin{equation}
+logistic(x)=\frac{1}{1+e^{-x}}
+\end{equation}
+The inverse of the logistic function, the \emph{logit} function, can
+therefore be used to map the search space of a parameter, \emph{p},
+from between $-\infty$ and $+\infty$ to between $0$ and $1$. The logit
+function is defined as:
+\begin{equation}
+logit(p) = log(\frac{p}{1-p})
+\end{equation}
+The logit function can be modifed to transform the search space from
+between $0$ and $1$ to one between $0$ and $max$ as follows:
+\begin{equation}
+newLogit(x) = \frac{max}{1+e^{-x}}
+\end{equation}
+with the inverse defined as:
+\begin{equation}
+newLogistic(x)=log(\frac{x}{max-x})
+\end{equation}
+
+The logic behind this modification can be expanded further to use the
+logistic function to provide lower bounds as well as upper bounds. As
+$x\rightarrow +\infty$, $logit(x)\rightarrow 1$. Similarly, as
+$x\rightarrow-\infty$, $logit(x)\rightarrow 0$. We can therefore modify
+the logistic function as follows:
+\begin{equation}
+f(x) = \frac{x_{max}-x_{min}}{1+e^{-x}} + x_{min}
+\end{equation}.
+
+We can see that as $x\rightarrow +\infty$, $f(x)\rightarrow x_{max}$,
+and as $x\rightarrow -\infty$, $f(x)\rightarrow x_{min}$. By limiting
+the parameter search space to a predetermined range of expected
+values, we ensure that the optimisation procedure does not get stuck
+in a local minimum far away from the actual parameter values. However,
+doing so requires us to make assumptions regarding where the real
+parameter values might lie. Whilst a good model fit might be produced
+within a provided range of parameter values, this fit might be sub
+optimal compared to the model produced from a set of entirely
+unexpected parameters. 
+
+An alternative, simple approach to bounding parameter values in the
+optimisation procedure is to modify the results returned by the
+objective function. As the Nelder Mead algorithm transforms parameter
+values with the aim of minimising the objective function, we can
+direct the parameter search by ensuring that the objective function
+returns high values when venturing into an undesirable parameter
+space. For example, we can include a simple check of each parameter
+with each call of the objective function; returning a high SSE value
+if the parameter is outside our desired range. This method was
+implemented initially; however, it appeared to result in the Nelder
+Mead algorithm returning nonsense values more frequently as it failed
+to identify any local minima. This is due to the fact that the
+optimisation surface becomes much less smooth, as each check outside
+of the specified bounds results in a sudden spike in function value.  
 
 
 \section{Evaluating Goodness of Fit}
@@ -812,4 +881,73 @@ introduction of an incubation period as in the \emph{SEIR} and
 \label{figure:candidates}
 \end{figure}
 
-\subsection{Implentation}
+\subsection{Selecting a Model}
+The implementation described here allows the user to either fit a
+specified epidemic type to the set of data. All relevant
+transition rate parameters (eg. beta, gamma) and S0 are included in the
+optimisation process, and we allow the user to optionally include I0
+as an unknown parameter. The user may also decide to allow the fitting
+framework to select the best fitting model for the data. In this case,
+the framework attempts to fit each candidate model and tracks the best
+fitting result, settling on the candidate model that best describes
+the data. This process is not as simple as choosing the model
+with the best R Square value. The shape of models with more parameters
+is much more adaptable by nature, as the increased number of
+parameters results in more inflection points. As all of the candidate
+models are extensions of the \emph{SIR} model, the more complex models
+(\emph{SEIR}, \emph{SErIR}) will tend to be selected simply due to
+their increased complexity. To prevent this overfitting, the relative
+model complexity must also be taken into consideration when selecting the best candidate model.
+
+The aim of the candidate model selection procedure is therefore to
+select the simplest model that provides a good fit to the data. A
+heuristic approach to this problem is to select the model with the
+fewest parameters that provides a sufficiently good fit. When
+considering which model to add, we first check the R Square value for
+each model type and only consider those models that provide a fit
+above a pre specified threshold. If more than one model provides a
+sufficiently good fit, we choose the model with the fewest
+parameters. If two or more models have the same number of parameters
+and provide a sufficiently good fit, then we are able to choose the
+with the highest R Square value. 
+
+A formal measure of the above heuristic is known as the \emph{Akaike
+  information criterion}, or \emph{AIC}.\cite{burnham} Based on information theory, the \emph{AIC} is a measure
+of statistical model quality for a given set of data that takes into
+account both goodness of fit and model complexity. In general terms, the \emph{AIC}
+value of a model is defined as:
+\begin{equation}
+AIC = 2k - 2ln(L)
+\end{equation}
+where $k$ is the number of free model parameters, and L is the maximised
+likelihood function. The preferred candidate model is that with the
+minimum \emph{AIC} value, which therefore minimises information loss. As we are only interested in the comparative
+\emph{AIC} values, we can use the $\delta$\emph{AIC} value between two
+models. Furthermore, we can also make adjustments for small sample
+sizes, as is the case with our epidemic data early on in the fitting
+procedure. This \emph{AICc} puts a greater penalty on complex models
+than the basic \emph{AIC} score, and is defined as:
+\begin{equation}
+AICc = -2ln(L) + 2k + \frac{2k(k+1)}{n - k - 1}
+\end{equation}
+In the scenario where we use the residual sum of squares as our
+objective function value, we use the following \emph{AIC} definition:
+\begin{equation}
+AIC = nln(RSS/n) + 2k
+\end{equation}
+
+where $n$ is the number of data points and $RSS$ is the residual sum
+of squares.
+
+In terms of implementation, we calculate the \emph{AICc} value for
+each candidate model and track the candidate model with the lowest
+\emph{AICc} value. Once all candidate models have been considered, the
+final model with the lowest \emph{AICc} value is chosen as the best
+fitting candidate model. As the first window of data points might not
+be representative of the entire data set, we perform this selection
+every 10 data points to ensure that the best model is chosen in light
+of recent data. 
+
+\section{Maximum Likelihood Based Estimation}
+An alternative to least squares based fitting is the use of Maximum
+Likelihood Estimation (MLE) as an objective function. The theory  ,

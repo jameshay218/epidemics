@@ -68,6 +68,7 @@ public:
 
 
   // Maths functions
+  double aicc(double sse, int n, int k);
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);
   double calculate_mean(vector<vector<double> > data, int column);

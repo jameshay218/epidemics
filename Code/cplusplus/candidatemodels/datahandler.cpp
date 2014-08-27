@@ -60,7 +60,7 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
   double RSquare,tempRSquare;
   double SSE = 99999999999.9;
   double tempSSE = 99999999999.9;
-  double currentBestSSE = 999999999999.9;
+  double currentBestAICc, tempAICc = 999999999999.9;
   int iterations = 0;
   int tempIterations = 0;
    
@@ -82,7 +82,7 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
   if(_epi != none) epidemics.push_back(new_epidemic(_epi,1,1.0));
  
   finalParams = tempPar = generate_seed_parameters();
-  for(unsigned int i = 5;i<this->current_data.size();++i){
+  for(unsigned int i = 20;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
@@ -99,7 +99,7 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
       cout << "Attempting to find best fitting model" << endl;
       for(unsigned int k = 0; k<candidateModels.size();++k){
 	cout << "Considering: ";
-	currentBestSSE = 999999999999.9;
+	//currentBestSSE = 999999999999.9;
 	print_epidemic_type(candidateModels[k]);
 	cout << endl;
 	tempEpi = NULL;
@@ -107,10 +107,14 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
 	epidemics.push_back(tempEpi);
 	tempSSE=optimise_single(tempPar, tempCombinedResults,tempAll1, tempIterations);
 	tempRSquare = 1 - tempSSE/SStot(temp_data, 1);
-	if((tempRSquare > targetRSq && tempSSE < currentBestSSE) || (tempRSquare > targetRSq && bestFit != NULL && (tempEpi->return_parameters().size() < bestFit->return_parameters().size())) || (bestFit != NULL && tempEpi->return_parameters().size() == bestFit->return_parameters().size() && tempSSE < currentBestSSE && tempIterations < iterations)){
+	tempAICc = aicc(tempSSE, temp_data.size(), tempEpi->return_parameters().size());
+	cout << "Model AICc: " << tempAICc << endl;
+	//if((tempRSquare > targetRSq && tempSSE < currentBestSSE) || (tempRSquare > targetRSq && bestFit != NULL && (tempEpi->return_parameters().size() < bestFit->return_parameters().size())) || (bestFit != NULL && tempEpi->return_parameters().size() == bestFit->return_parameters().size() && tempSSE < currentBestSSE && tempIterations < iterations)){
+	if(tempRSquare > targetRSq && tempAICc < currentBestAICc){
+	  cout << "Model improvement" << endl;
 	  bestFit = new_epidemic(candidateModels[k],1,1.0);
 	  SSE = tempSSE; 
-	  currentBestSSE = tempSSE;
+	  currentBestAICc = tempAICc;
 	  RSquare = tempRSquare;
 	  finalParams = tempPar;
 	  combinedResults = tempCombinedResults;
@@ -192,7 +196,7 @@ void Handler::realtime_fit_multi(double targetRSq){
   vector<vector<vector<double> > > componentResults, componentResultsTemp;
   double RSquare, tempRSquare, SSE, tempSSE, currentBestSSE;
   int iterations, tempIterations;
-  
+  double bestAICc, tempAICc;
   srand(clock());
 
   candidateModels.push_back(spike);
@@ -201,7 +205,8 @@ void Handler::realtime_fit_multi(double targetRSq){
 
   // Start of model fitting process
   t1=clock();
-  epidemics.push_back(new_epidemic(sir, 10, 1.0));
+  epidemics.push_back(new_epidemic(sir, 1, 1.0));
+  epidemics.push_back(new_epidemic(sir, 4, 4.0));
   //add_epidemic(sir,20);
   // Start off with a baseline model of the mean of the first 4 points
   for(unsigned int j = 0; j <= 4; ++j){
@@ -210,7 +215,7 @@ void Handler::realtime_fit_multi(double targetRSq){
   this->baseModel = this->current_model = base_model(this->temp_data);
 
   // For each time point in the current data set, carry out the fitting procedure
-  for(unsigned int i = 30;i<this->current_data.size();++i){
+  for(unsigned int i = 100;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
@@ -290,11 +295,13 @@ void Handler::realtime_fit_multi(double targetRSq){
       cout << "Epidemic detected!" << endl;
       cout << "Infecteds unaccounted for: " << residuals[i-1][1] << endl;
       bestFit = NULL;
+      bestAICc = 999999999999.9;
+	//currentBestSSE = 999999999.9;
       // Temporarily store the current epidemic state and add a new epidemic to the current set
       this->tempEpidemics = this->epidemics;
       for(unsigned int f = 0; f < candidateModels.size(); ++f){
+	
 	toRemove = NULL;
-	currentBestSSE = 999999999.9;
 	newEpidemic = candidateModels[f];
 	cout << "Considering addition of ";
 	print_epidemic_type(newEpidemic);
@@ -305,17 +312,22 @@ void Handler::realtime_fit_multi(double targetRSq){
 	cout << "Epidemics size: " << epidemics.size() << endl;
 	// Produce optimised fit with added epidemic
 	tempSSE = optimiseEpidemics(finalParamsTemp, combinedResultsTemp, componentResultsTemp, tempIterations);
+	tempAICc = aicc(tempSSE, temp_data.size(), toRemove->return_parameters().size());
+	cout << "AICc: " << tempAICc << endl;
 	tempRSquare = 1 - tempSSE/SStot(this->temp_data,1);
 	
 	cout << "Fit with additional epidemic: " << tempRSquare << endl;
 	cout << "Iterations taken: " << tempIterations << endl;
 	// If fit improved, keep track of epidemic. If best fit, add to epidemics at the end
-	if((tempRSquare > RSquare && tempSSE < currentBestSSE) || (tempRSquare > targetRSq && bestFit != NULL && (toRemove->return_parameters().size() < bestFit->return_parameters().size())) || (bestFit != NULL && toRemove->return_parameters().size() == bestFit->return_parameters().size() && tempSSE < currentBestSSE && tempIterations < iterations)){
-	  cout << "Fit improved with additional epidemic. Add epidemic" << endl;
+	//	if((tempRSquare > RSquare && tempSSE < currentBestSSE) || (tempRSquare > targetRSq && bestFit != NULL && (toRemove->return_parameters().size() < bestFit->return_parameters().size())) || (bestFit != NULL && toRemove->return_parameters().size() == bestFit->return_parameters().size() && tempSSE < currentBestSSE && tempIterations < iterations)){
+	if(tempRSquare > RSquare && tempAICc < bestAICc){
+	cout << "Fit improved with additional epidemic. Add epidemic" << endl;
 	  if(bestFit != NULL) delete bestFit;
 	  bestFit = new_epidemic(newEpidemic,i, residuals[i-1][1]);
+	  cout << "Better AICc value" << endl;
 	  SSE = tempSSE;
-	  currentBestSSE = tempSSE;
+	  //currentBestSSE = tempSSE;
+	  bestAICc = tempAICc;
 	  RSquare = tempRSquare;
 	  finalParams = finalParamsTemp;
 	  combinedResults = combinedResultsTemp;
@@ -443,7 +455,7 @@ double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<doub
   }
   parameters = generate_seed_parameters();
   // If there are epidemics to be fitted, perform 40 random fits and keep best fitting model
-  for(int index=0;index<10;index++){    
+  for(int index=0;index<40;index++){    
             
     // Clear the temporary seed parameters and seed rand
    
@@ -495,7 +507,8 @@ double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<doub
 // current model and current data.  
 double Handler::fitEpidemics(vector<double> params){
   int z = 0;
-  current_model = create_empty_data_vector(temp_data.size());
+  //current_model = create_empty_data_vector(temp_data.size());
+  current_model = baseModel;
   for(unsigned int i = 0;i<epidemics.size();++i){
     tempParams.clear();
     temp_model.clear();
@@ -529,7 +542,8 @@ double Handler::fitEpidemics(vector<double> params){
 
  // As above, but returns the overall model.
  vector<vector<double> > Handler::ode_solve(vector<double> params){
-   vector<vector<double> > overallResults = create_empty_data_vector(temp_data.size());
+   //   vector<vector<double> > overallResults = create_empty_data_vector(temp_data.size());
+   vector<vector<double> > overallResults = baseModel;
    int z = 0;
    for(unsigned int i = 0;i<epidemics.size();++i){
      tempParams.clear();
@@ -681,6 +695,13 @@ double Handler::fitEpidemics(vector<double> params){
 
 
  /* ================================= MATHEMATICAL FUNCTIONS =====================================*/
+double Handler::aicc(double sse, int n, int k){
+  if(n == 0 || (n-k-1) == 0) return 99999999999.9;
+  double aic = n*log(sse/n) - 2*k;
+  return(aic + (2*k*(k+1))/(n-k-1));
+}
+
+
 
  bool Handler::params_check(vector<double> pars, EpiType epi){
    switch(epi){
@@ -764,8 +785,8 @@ vector<double> Handler::rand_params(EpiType _type){
   mu = (rand()%100+1)/10000.0;
   gamma = (rand()%200+beta)/1000.0;
   i0 = rand()%10+1;
-  s0 = rand()%1000+i0;
-
+  s0 = rand()%20000+1000;
+  
   switch(_type){
   case sir:
     params.push_back(log(beta));
@@ -972,7 +993,7 @@ void Handler::print_epidemic_type(EpiType epi){
 void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, int column){
   
   Gnuplot gp;   // Need instance of the Gnuplot class to pipe commands to gnuplot
-  string name = "graphs1/output"; // The save location and general name of the graph to be saved
+  string name = "graphs/output"; // The save location and general name of the graph to be saved
   string _index = to_string((index-1));
   string label, xlab;
   string colours[5] = {"orange","yellow","cyan","darkblue","violet"};
