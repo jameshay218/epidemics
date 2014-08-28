@@ -190,11 +190,12 @@ int main() {
       cout << "--------------------------------------------------------------------" << endl;
       cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
       cout << "--------------------------------------------------------------------" << endl;
+      //      boolT0 = false;
       dataHandler.update_options(mle,boolT0,boolI0,singleEpidemic,savePlot,saveResults);
-      dataHandler.realtime_fit_multi(targetRSq);
+      dataHandler.realtime_fit_multi(0.8);
+      //dataHandler.overall_test(0.95);
       break;
     }
-
   
   }
   return(0); 

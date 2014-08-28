@@ -27,9 +27,10 @@ void printcon(const Con& c){
 class Handler{
 private:
   vector<double> tempParams;
-  vector<vector<double> > current_data, current_model, temp_model, empty_model, temp_data, baseModel;
+  vector<vector<double> > baseModel, current_data, current_model, temp_model, empty_model, temp_data;
   vector<Epidemic*> epidemics, tempEpidemics;
   bool useMLE, optimT0, optimI0, singleEpi, plot, save;
+
 public:
   Handler();
   ~Handler();
@@ -49,16 +50,14 @@ public:
   }
   void remove_epidemic(Epidemic* remove);
   vector<Epidemic*> fewer_epidemics(int j);
-  Epidemic* new_epidemic(EpiType _newEpidemic, int time, double infected);
+  Epidemic* new_epidemic(EpiType _newEpidemic, int time);
   vector<double> concatenate_vectors(vector<double> a, vector<double> b);
   double import_data(const char* file);
   void print_vector(vector< vector<double> > my_data);
   void print_vector(vector< vector<int> > my_data);
   vector<double> generate_seed_parameters();
-  double optimise_single(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults, int& itr);
-
   void update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, bool savePlot, bool saveResults);
-  void realtime_fit_single(double targetRSq, EpiType _epi);
+
   vector<vector<double> > ode_solve(vector<double> params);
   vector<vector<vector<double> > > ode_solve_separate(vector<double> params);
 
@@ -66,24 +65,27 @@ public:
   double poisson_pmf(const double k, const double lambda);
   double fitEpidemicsMLE(vector<double> params);
 
-
+  vector<double> convert_parameters_back(vector<double> pars, int number);
+  vector<double> convert_parameters_forward(vector<double> pars, int number);
   // Maths functions
-  double aicc(double sse, int n, int k);
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);
   double calculate_mean(vector<vector<double> > data, int column);
   double calculate_sd(vector<vector<double> > data, int column);
   vector<vector<double> > get_residuals(vector<vector<double> > data1, vector<vector<double> > data2, int index);
   void print_epidemic_type(EpiType epi);
-  bool params_check(vector<double> pars, EpiType epi);
 
-
+  double aicc(double sse, int n, int k);
+  double logistic(double x, double xmin, double xmax);
+  double logit(double y, double xmin, double xmax);
   // Graph plotting functions
   void plotGraph(vector<vector<double> > finalResults, vector<vector<double> > data, int index);
   void plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, int column);
   string create_label(Epidemic* epi, vector<double> parameters, int& i);
 
 
+  void realtime_fit_single(double targetRSq, EpiType _epi);
+  double optimise_single(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults, int& itr);
 
 
   // Old functions

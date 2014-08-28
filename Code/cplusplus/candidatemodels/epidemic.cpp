@@ -7,7 +7,7 @@ Epidemic::~Epidemic(){
 }
 
 // Constructor
-Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int detection, double _infecteds){
+Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int detection){
   // Determine the type of epidemic and adjust population size stores accordingly
   if(_type==sir || _type==irsir){
     noPops=3;
@@ -19,7 +19,7 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
     noPops = 4;
   }
   else if (_type == serir){
-    noPops = 4;
+    noPops = 5;
   }
   else{
     noPops=3;
@@ -37,7 +37,7 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
   diffIndex = 0;
   
   // Step size for Runge Kutta
-  step = 0.1;
+  step = 0.5;
   
   // Desired size of total solved model
   tmax = _tmax;
@@ -55,8 +55,6 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
   total_model = temp_model;
   type = _type;
   detectionTime = detection;
-  infecteds = _infecteds;
-
 }
 
 /* ============================= RUNGE KUTTA INTEGRATION ALGORITHM =========================*/
