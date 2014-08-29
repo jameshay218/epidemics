@@ -37,7 +37,7 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
   diffIndex = 0;
   
   // Step size for Runge Kutta
-  step = 0.5;
+  step = 0.1;
   
   // Desired size of total solved model
   tmax = _tmax;
@@ -54,7 +54,12 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
   }
   total_model = temp_model;
   type = _type;
-  detectionTime = detection;
+  detectionTime = 200;
+  minTime = 0;
+  seedTime = detectionTime;
+  //if(minTime <=0) minTime = 0;
+  //  if(seedTime <=0) seedTime = 0;
+
 }
 
 /* ============================= RUNGE KUTTA INTEGRATION ALGORITHM =========================*/

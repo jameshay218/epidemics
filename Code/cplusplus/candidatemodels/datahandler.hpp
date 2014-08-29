@@ -27,6 +27,7 @@ void printcon(const Con& c){
 class Handler{
 private:
   vector<double> tempParams;
+  vector<int> epidemicSizes, tempSizes;
   vector<vector<double> > baseModel, current_data, current_model, temp_model, empty_model, temp_data;
   vector<Epidemic*> epidemics, tempEpidemics;
   bool useMLE, optimT0, optimI0, singleEpi, plot, save;
@@ -57,16 +58,15 @@ public:
   void print_vector(vector< vector<int> > my_data);
   vector<double> generate_seed_parameters();
   void update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, bool savePlot, bool saveResults);
-
+  vector<int> fewer_sizes(int j);
   vector<vector<double> > ode_solve(vector<double> params);
   vector<vector<vector<double> > > ode_solve_separate(vector<double> params);
 
   double dpois(vector<vector<double> > model, vector<vector<double> > data);
   double poisson_pmf(const double k, const double lambda);
   double fitEpidemicsMLE(vector<double> params);
-
-  vector<double> convert_parameters_back(vector<double> pars, int number);
-  vector<double> convert_parameters_forward(vector<double> pars, int number);
+  vector<double> convert_parameters_back(vector<double> pars, int number, int maxTime, int minTime);
+  vector<double> convert_parameters_forward(vector<double> pars, int number, int maxTime, int minTime);
   // Maths functions
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);
@@ -78,6 +78,9 @@ public:
   double aicc(double sse, int n, int k);
   double logistic(double x, double xmin, double xmax);
   double logit(double y, double xmin, double xmax);
+
+  vector<double> convert_all_params_back(vector<double> pars);
+
   // Graph plotting functions
   void plotGraph(vector<vector<double> > finalResults, vector<vector<double> > data, int index);
   void plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, int column);
