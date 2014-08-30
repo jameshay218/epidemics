@@ -77,7 +77,7 @@ vector<double> Handler::convert_parameters_forward(vector<double> pars, int numb
   if(number == 3){
     temporary.push_back(log(pars[0]));
     temporary.push_back(log(pars[1]));
-    temporary.push_back(log(pars[2]));
+    // temporary.push_back(log(pars[2]));
     // temporary.push_back(logit(pars[2],minTime,maxTime));
   }
   else if(number == 4){
@@ -109,13 +109,14 @@ vector<double> Handler::convert_parameters_forward(vector<double> pars, int numb
 
 
 
-void Handler::update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, bool savePlot, bool saveResults){
+void Handler::update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, bool savePlot, bool saveResults,string location){
   useMLE = mle;
   optimT0 = useT0;
   optimI0 = useI0;
   singleEpi = _singleEpi;
   plot = savePlot;
   save = saveResults;
+  saveLocation = location;
 }
 
 
@@ -123,189 +124,16 @@ void Handler::update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, 
 /* ================================ FINAL LEAST SQUARES ============================= */
 
 void Handler::realtime_fit_multi(double targetRSq){
-  clock_t t1, t2; // To record the total run time
+  clock_t t1, t2,t3; // To record the total run time
   EpiType newEpidemic; // Keep track of the type of a new epidemic to be added
   Epidemic *toRemove, *bestFit; // Keep track of a newly created epidemic to allow deletion
-  vector<EpiType> candidateModels;
+  vector<EpiType> candidateModels,selectedTypes;
   vector<double> finalParams, finalParamsTemp; // Keep track of parameters from optimisation
-  vector<vector<double> > combinedResults, residuals, combinedResultsTemp; // 
+  vector<vector<double> > combinedResults, residuals, combinedResultsTemp,saveResults; // 
   vector<vector<vector<double> > > componentResults, componentResultsTemp;
   double RSquare, tempRSquare, SSE, tempSSE, currentBestSSE;
   int iterations, tempIterations;
-  double bestAICc, tempAICc, AICc;
-
-  epidemics.push_back(new_epidemic(sir,15));
-  epidemicSizes.push_back(4);
-  epidemics.push_back(new_epidemic(spike,40));
-  epidemicSizes.push_back(3);
-  epidemics.push_back(new_epidemic(sir,95));
-  epidemicSizes.push_back(4);
-
-
-
-  for(unsigned int j = 0; j <= 4; ++j){
-    this->temp_data.push_back(this->current_data[j]);
-  }
-  this->baseModel = this->current_model = base_model(this->temp_data);
-  cout << "Here" << endl;
-  this->empty_model = create_empty_data_vector(current_data.size());
-  epidemics[0]->update_data(current_data);
-  //print_vector(baseModel);
-  
-  plotGraph(current_data,current_data,1);
-
-  finalParams.push_back(0.001);
-  finalParams.push_back(0.1);
-  finalParams.push_back(500);
-  finalParams.push_back(5);
-  finalParamsTemp = convert_parameters_forward(finalParams, 4, 200, 0);
-  finalParams.clear();
-  finalParams.push_back(0.1);
-  finalParams.push_back(800);
-  finalParams.push_back(30);
-  finalParams = convert_parameters_forward(finalParams,3,200,0);
-  finalParamsTemp = concatenate_vectors(finalParamsTemp, finalParams);
-  finalParams.clear();
-  finalParams.push_back(0.0008);
-  finalParams.push_back(0.1);
-  finalParams.push_back(1000);
-  finalParams.push_back(85);
-  finalParamsTemp = concatenate_vectors(finalParamsTemp, convert_parameters_forward(finalParams, 4, 200, 0));
-  printcon(finalParamsTemp);
-  finalParams = convert_all_params_back(finalParamsTemp);
-  printcon(finalParams);
-
-
-  residuals = ode_solve(finalParamsTemp);
-  plotGraph(residuals,current_data,1);
-
-  cout << calculate_SSE(residuals,current_data) << endl;
-  temp_data = current_data;
-  cout << "SSE2: " << fitEpidemics(finalParamsTemp) << endl;
-
-  //  print_vector(get_residuals(residuals,current_data,1));
-  finalParams.clear();
-  finalParamsTemp.clear();
-  finalParams.push_back(0.001);
-  finalParams.push_back(0.2);
-  finalParams.push_back(600);
-  finalParams.push_back(7);
-  finalParamsTemp = convert_parameters_forward(finalParams, 4, 200, 0);
-  finalParams.clear();
-  finalParams.push_back(0.1);
-  finalParams.push_back(800);
-  finalParams.push_back(39);
-  finalParams = convert_parameters_forward(finalParams,3,200,0);
-  finalParamsTemp = concatenate_vectors(finalParamsTemp, finalParams);
-  finalParams.clear();
-  finalParams.push_back(0.001);
-  finalParams.push_back(0.1);
-  finalParams.push_back(2000);
-  finalParams.push_back(90);
-  finalParamsTemp = concatenate_vectors(finalParamsTemp, convert_parameters_forward(finalParams, 4, 200, 0));
-  printcon(finalParamsTemp);
-  finalParams = convert_all_params_back(finalParamsTemp);
-  printcon(finalParams);
-
-
-  RSquare = 1- fitEpidemics(finalParamsTemp)/SStot(temp_data,1);
-  cout << "RSquare before: " << RSquare << endl;
-
-
-  vector<double> tempPar;
-  Simplex simplex;
-  tempPar = simplex.neldermead(&Handler::fitEpidemics, *this,  finalParamsTemp, iterations);
-  printcon(tempPar);
-  SSE = fitEpidemics(tempPar);
-  RSquare = 1- SSE/SStot(temp_data,1);
-  cout << "RSquare: " << RSquare << endl;
-  residuals = ode_solve(tempPar);
-  plotGraph(temp_data,residuals,2);
-
-
-  return;
- 
-  printcon(finalParamsTemp);
-  finalParams = convert_parameters_back(finalParamsTemp,4,10,-10);
- 
-  //print_vector(residuals);
-  plotGraph(residuals,current_data,1);
-  temp_data = current_data;
- 
-  combinedResults = get_residuals(temp_data,residuals,1);
-  //print_vector(combinedResults);
- 
-  
-  
-
-  return;
-
-  finalParams.clear();
-  finalParams.push_back(0.0001);
-  finalParams.push_back(0.2);
-  finalParams.push_back(500);
-  finalParams.push_back(10);
-  residuals = epidemics[0]->ode_solve_combined(finalParams);
-  epidemics[0]->update_data(current_data);
-  //print_vector(residuals);
-  plotGraph(residuals,residuals,2);
-
-
-  finalParams.clear();
-  finalParams.push_back(0.02);
-  finalParams.push_back(0.2);
-  finalParams.push_back(500);
-  finalParams.push_back(10);
-  residuals = epidemics[0]->ode_solve_combined(finalParams);
-  epidemics[0]->update_data(current_data);
-  //print_vector(residuals);
-  plotGraph(residuals,residuals,3);
-
-
-  finalParams.clear();
-  finalParams.push_back(0.02);
-  finalParams.push_back(0.01);
-  finalParams.push_back(500);
-  finalParams.push_back(10);
-  residuals = epidemics[0]->ode_solve_combined(finalParams);
-  epidemics[0]->update_data(current_data);
-  //print_vector(residuals);
-  plotGraph(residuals,residuals,4);
-
-
-  finalParams.clear();
-  finalParams.push_back(0.000001);
-  finalParams.push_back(0.01);
-  finalParams.push_back(500);
-  finalParams.push_back(10);
-  residuals = epidemics[0]->ode_solve_combined(finalParams);
-  epidemics[0]->update_data(current_data);
-  //print_vector(residuals);
-  plotGraph(residuals,residuals,5);
-
-
-  return;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  double bestAICc, tempAICc, AICc,RMSE;
 
   candidateModels.push_back(spike);
   candidateModels.push_back(sir);
@@ -313,6 +141,7 @@ void Handler::realtime_fit_multi(double targetRSq){
 
   // Start of model fitting process
   t1=clock();
+  srand(time(NULL));
   //epidemics.push_back(new_epidemic(sir, 1));
   this->epidemics.push_back(new_epidemic(sir, 10));
   this->epidemicSizes.push_back(4);
@@ -328,7 +157,7 @@ void Handler::realtime_fit_multi(double targetRSq){
   this->baseModel = this->current_model = base_model(this->temp_data);
 
    // For each time point in the current data set, carry out the fitting procedure
-  for(unsigned int i = 20;i<this->current_data.size();++i){
+  for(unsigned int i = 45;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
@@ -489,10 +318,35 @@ void Handler::realtime_fit_multi(double targetRSq){
     cout << "Final RSquare: " << RSquare << endl;
     cout << "Final parameters: ";
     printcon(finalParams) ;
+    finalParams.push_back(RSquare);
+    finalParams.push_back(RMSE);
+    saveResults.push_back(finalParams);
+    RMSE = sqrt((SSE/temp_data.size()));
+    cout << "RMSE: " << RMSE << endl;
     cout << endl << "-----------------" << endl;
     this->current_model = combinedResults;
   }
   t2=clock();
+  t3 = (t2-t1)/CLOCKS_PER_SEC;
+  finalParams.clear();
+  finalParams.push_back(double(t3));
+  saveResults.push_back(finalParams);
+  print_vector(saveResults);
+
+  ofstream myfile; 
+  myfile.open ((saveLocation + "/results.csv")); 
+  
+  for(unsigned int i = 0; i < saveResults.size();++i){
+    for(unsigned int j = 0;j < saveResults[i].size();++j){
+      myfile << saveResults[i][j] << ",";
+    }
+    myfile << "\n";
+  }
+  for(unsigned int i = 0; i < selectedTypes.size();++i){
+    myfile << selectedTypes[i] << ",";
+  }
+  myfile << "\n";
+  myfile.close();
   cout << "Time taken: " << (t2-t1)/CLOCKS_PER_SEC << endl << endl;
 }
 
@@ -672,7 +526,7 @@ double Handler::fitEpidemics(vector<double> params){
     temp_model = epidemics[i]->ode_solve(tempParams);
     current_model = combine_vectors(current_model, temp_model);
   }
-  cout << calculate_SSE(current_model,temp_data) << endl;
+  //cout << calculate_SSE(current_model,temp_data) << endl;
   return(calculate_SSE(current_model, temp_data));
 }
 
@@ -704,7 +558,7 @@ vector<vector<double> > Handler::ode_solve(vector<double> params){
   for(unsigned int i = 0;i<epidemics.size();++i){
     tempParams.clear();
     temp_model.clear();
-    for(unsigned int x = 0;x<epidemics[i]->return_parameters().size();++x){
+    for(unsigned int x = 0;x<epidemicSizes[i];++x){
       tempParams.push_back(parr[z]);
       z++;
     }
@@ -1453,7 +1307,7 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
   if(_epi != none) epidemics.push_back(new_epidemic(_epi,10));
  
   finalParams = tempPar = generate_seed_parameters();
-  for(unsigned int i = 38;i<this->current_data.size();++i){
+  for(unsigned int i = 5;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     

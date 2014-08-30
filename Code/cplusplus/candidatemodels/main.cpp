@@ -60,13 +60,6 @@ int main() {
   cout << "====================================================================" << endl << endl;
   
   while(true){
-    /* User specifies a data file */
-    cout << "--------------------------------------------------------------------" << endl;
-    cout << "What would you like to do?                                          " << endl;
-    cout << "          1. Fit single epidemic                                    " << endl;
-    cout << "          2. Fit synthedemic                                       " << endl;
-    cout << "--------------------------------------------------------------------" << endl;
-    cin >> option;
     cout << "Would you like to use default options (y/n)?" << endl;
     cin >> defaultOptions;
 
@@ -98,35 +91,36 @@ int main() {
       cin >> file;
 	
     }
-    if(!defaults){
-      cout << "Please specify a save location: " << endl;
-      cin >> saveLocation;
-      cout << "--------------------------------------------------------------------" << endl;
-      cout << "Specified: " << saveLocation << endl;
-      cout << "--------------------------------------------------------------------" << endl;
-      while(!check_existence(saveLocation)){
-	cout << endl << "Error - no such directory exists. Would you like to create it (y/n)?" << endl;
-	cin >> createDir;
-	switch(createDir){
-	case 'y':
-	  dir = saveLocation;
-	  if(boost::filesystem::create_directory(dir)) cout << "Created directory named \"" << saveLocation << "\"" << endl;
-	  else{ 
-	    cout << "Error creating directory. Please specify another location:" << endl;
-	    cin >> saveLocation;
-	  }
-	  break;
-	case 'n':
-	  cout << "Please specify another directory:" << endl;
+    cout << "Please specify a save location: " << endl;
+    cin >> saveLocation;
+    cout << "--------------------------------------------------------------------" << endl;
+    cout << "Specified: " << saveLocation << endl;
+    cout << "--------------------------------------------------------------------" << endl;
+    while(!check_existence(saveLocation)){
+      cout << endl << "Error - no such directory exists. Would you like to create it (y/n)?" << endl;
+      cin >> createDir;
+      switch(createDir){
+      case 'y':
+	dir = saveLocation;
+	if(boost::filesystem::create_directory(dir)) cout << "Created directory named \"" << saveLocation << "\"" << endl;
+	else{ 
+	  cout << "Error creating directory. Please specify another location:" << endl;
 	  cin >> saveLocation;
-	  break;
-	default:
-	  cout << "Invalid option" << endl;
-	  cout << "Please specify another directory:" << endl;
-	  cin >> saveLocation;
-	  break;
 	}
+	break;
+      case 'n':
+	cout << "Please specify another directory:" << endl;
+	cin >> saveLocation;
+	break;
+      default:
+	cout << "Invalid option" << endl;
+	cout << "Please specify another directory:" << endl;
+	cin >> saveLocation;
+	break;
       }
+    }
+    if(!defaults){
+     
       cout << "Use MLE or SSE based fitting (1/2)?" << endl;
       cin >> fitting;
       switch(fitting){
@@ -146,56 +140,18 @@ int main() {
       
       cout << "What is your target R-Squared? (between 0 and 1, default is 0.95)" << endl;
       cin >> targetRSq;
-      
-      
-
     }
-    
-    switch(option){
-    case 1:
-      singleEpidemic = true;
-      boolT0 = false;
-      boolI0 = false;
-      mle = false;
-      if(!defaults){
-	cout << "Would you like to include t0 in the optimisation (y/n)?" << endl;
-	cin >> useT0;
-	if(useT0 == 'y') boolT0 = true;
-	else boolT0 = false;
-	
-	cout << "Which epidemic type would you like to test?" << endl;
-	cout << "     0. Unknown (attempts to detect best fitting type)" << endl;
-	cout << "     1. SIR" << endl;
-	cout << "     2. irSIR" << endl;
-	cout << "     3. SEIR" << endl;
-	cout << "     4. SERIR" << endl;
-	cout << "     5. EXP" << endl;
-	
-	cin >> testEpiType;
-
-	while(testEpiType < 0 || testEpiType > 5){
-	  cout << "Invalid type. Please select another: " << endl;
-	  cin >> testEpiType;
-	}
-	epiType = convert_to_epi_type(testEpiType);
-      }
-      dataHandler.update_options(mle,boolT0,boolI0,singleEpidemic,savePlot,saveResults);
-      dataHandler.realtime_fit_single(targetRSq, epiType);
-      cout << "--------------------------------------------------------------------" << endl;
-      cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
-      cout << "--------------------------------------------------------------------" << endl;
-      break;
-    case 2:
-      singleEpidemic = false;
-      cout << "--------------------------------------------------------------------" << endl;
-      cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
-      cout << "--------------------------------------------------------------------" << endl;
-      //      boolT0 = false;
-      dataHandler.update_options(mle,boolT0,boolI0,singleEpidemic,savePlot,saveResults);
-      dataHandler.realtime_fit_multi(0.8);
-      //dataHandler.overall_test(0.95);
-      break;
-    }
+   
+    singleEpidemic = false;
+    cout << "--------------------------------------------------------------------" << endl;
+    cout << "********************* FITTING MODEL PARAMETERS *********************" << endl;
+    cout << "--------------------------------------------------------------------" << endl;
+    //      boolT0 = false;
+    dataHandler.update_options(mle,boolT0,boolI0,singleEpidemic,savePlot,saveResults,saveLocation);
+    dataHandler.realtime_fit_multi(0.95);
+    //dataHandler.overall_test(0.95);
+    break;
+   
   
   }
   return(0); 

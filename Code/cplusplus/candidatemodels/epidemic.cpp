@@ -56,7 +56,8 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
   type = _type;
   detectionTime = 200;
   minTime = 0;
-  seedTime = detectionTime;
+  seedTime = detection;
+  
   //if(minTime <=0) minTime = 0;
   //  if(seedTime <=0) seedTime = 0;
 

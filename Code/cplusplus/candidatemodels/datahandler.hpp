@@ -31,7 +31,7 @@ private:
   vector<vector<double> > baseModel, current_data, current_model, temp_model, empty_model, temp_data;
   vector<Epidemic*> epidemics, tempEpidemics;
   bool useMLE, optimT0, optimI0, singleEpi, plot, save;
-
+  string saveLocation = "graphs/";
 public:
   Handler();
   ~Handler();
@@ -57,7 +57,7 @@ public:
   void print_vector(vector< vector<double> > my_data);
   void print_vector(vector< vector<int> > my_data);
   vector<double> generate_seed_parameters();
-  void update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, bool savePlot, bool saveResults);
+  void update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, bool savePlot, bool saveResults,string location);
   vector<int> fewer_sizes(int j);
   vector<vector<double> > ode_solve(vector<double> params);
   vector<vector<vector<double> > > ode_solve_separate(vector<double> params);
