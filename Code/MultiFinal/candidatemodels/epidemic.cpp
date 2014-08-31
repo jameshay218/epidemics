@@ -11,18 +11,23 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
   // Determine the type of epidemic and adjust population size stores accordingly
   if(_type==sir || _type==irsir){
     noPops=3;
+    parSize= 4;
   }
   else if(_type==spike){
     noPops=1;
+    parSize= 3;
   }
   else if (_type==seir){
     noPops = 4;
+    parSize= 5;
   }
   else if (_type == serir){
     noPops = 5;
+    parSize= 6;
   }
   else{
-    noPops=3;
+    noPops=3;    
+    parSize= 4;
   }
 
   dPop.resize(noPops);
@@ -55,9 +60,9 @@ Epidemic::Epidemic(double _tmax, vector<vector<double> > x, EpiType _type, int d
   total_model = temp_model;
   type = _type;
   detectionTime = detection;
-  minTime = 0;
-  seedTime = detection;
-  
+  detectionTimeTemp = detection;
+  active = true;
+  optimTime = detection;
   //if(minTime <=0) minTime = 0;
   //  if(seedTime <=0) seedTime = 0;
 

@@ -27,8 +27,8 @@ vector<vector<double> > Spike::ode_solve(vector<double> parameters){
     else t0 = 0;*/
   populations[0] = parameters[1];
   //t0 = parameters[2];
-  t0 = parameters[2];
-  //t0 = 25;
+  if(active) t0 = parameters[2];
+  else t0 = detectionTime;
   Solve_Eq_t0(temp_model,0);
   return(temp_model);
 }
@@ -39,8 +39,8 @@ vector<vector<double> > Spike::ode_solve_combined(vector<double> parameters){
   reset_models((tmax/step));
   gamma = parameters[0];
   populations[0] = parameters[1];
-  t0 = parameters[2];
-  // t0 = detectionTime;
+  if(active) t0 = parameters[2];
+  else t0 = detectionTime;
   Solve_Eq_total(temp_model, 0);
   return(temp_model);
  }

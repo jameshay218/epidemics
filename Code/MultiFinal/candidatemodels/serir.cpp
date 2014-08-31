@@ -22,13 +22,13 @@ void SERIR::Diff(vector<double> Pop) {
 vector<vector<double> > SERIR::ode_solve_combined(vector<double> parameters){
   pars = parameters;
   reset_models(tmax/step);
-  beta = exp(parameters[0]);
-  alpha = exp(parameters[1]);
-  mu = exp(parameters[2]);
-  gamma = exp(parameters[3]);
-  populations[0] = exp(parameters[4]);
-  t0 = exp(parameters[5]);
-    
+  beta = parameters[0];
+  alpha = (parameters[1]);
+  mu = (parameters[2]);
+  gamma = (parameters[3]);
+  populations[0] = (parameters[4]);
+  if(active) t0 = (parameters[5]);
+  else t0 = detectionTime;
   populations[1] = 0.0;
   populations[2] = 1.0;
   populations[3] = 0.0;
@@ -39,13 +39,13 @@ vector<vector<double> > SERIR::ode_solve_combined(vector<double> parameters){
 vector<vector<double> > SERIR::ode_solve(vector<double> parameters){
   pars = parameters;
   reset_models(current_data.size()/step);
-  beta = exp(parameters[0]);
-  alpha = exp(parameters[1]);
-  mu = exp(parameters[2]);
-  gamma = exp(parameters[3]);
-  populations[0] = exp(parameters[4]);
-  t0 = exp(parameters[5]);
-  
+  beta = (parameters[0]);
+  alpha = (parameters[1]);
+  mu =(parameters[2]);
+  gamma = (parameters[3]);
+  populations[0] = (parameters[4]);
+  if(active) t0 = (parameters[5]);
+  else t0 = detectionTime;
   populations[1] = 0.0;
   populations[2] = 1.0;
   populations[3] = 0.0;

@@ -157,7 +157,7 @@ int main() {
     case 1:
       singleEpidemic = true;
       boolT0 = false;
-      boolI0 = true;
+      boolI0 = false;
       mle = false;
       if(!defaults){
 	cout << "Would you like to include t0 in the optimisation (y/n)?" << endl;

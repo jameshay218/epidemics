@@ -10,8 +10,8 @@ SEIR::~SEIR(){
 void SEIR::Diff(vector<double> Pop) {
   // The differential equations
   dPop[0] = - beta*Pop[0]*Pop[2];              // dS/dt
-  dPop[1] = beta*Pop[0]*Pop[2] - alpha*Pop[1];   // dI/dt
-  dPop[2] = alpha*Pop[1] - gamma*Pop[2];      //dE/dt
+  dPop[1] = beta*Pop[0]*Pop[2] - alpha*Pop[1];   // dE/dt
+  dPop[2] = alpha*Pop[1] - gamma*Pop[2];      //dI/dt
   dPop[3] = gamma*Pop[2];                    // dR/dt
 }
 
@@ -26,8 +26,8 @@ vector<vector<double> > SEIR::ode_solve_combined(vector<double> parameters){
   alpha = parameters[1];
   gamma = parameters[2];
   populations[0] = parameters[3];
-  t0 = parameters[4];
-    
+  if(active) t0 = parameters[4];
+  else t0 = detectionTime;
   populations[1] = 0.0;
   populations[2] = 1.0;
   populations[3] = 0.0;
@@ -43,8 +43,8 @@ vector<vector<double> > SEIR::ode_solve(vector<double> parameters){
   alpha = parameters[1];
   gamma = parameters[2];
   populations[0] = parameters[3];
-  t0 = parameters[4];
-
+  if(active) t0 = parameters[4];
+  else t0 = detectionTime;
   populations[1] = 0.0;
   populations[2] = 1.0;
   populations[3] = 0.0;

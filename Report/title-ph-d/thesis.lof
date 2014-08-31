@@ -13,14 +13,23 @@
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Least Squares Fitting Objective Function\relax }}{36}
 \contentsline {figure}{\numberline {3.6}{\ignorespaces The Gillespie algorithm is run with original parameter values of $\beta = 0.001, \gamma = 0.1, S_0 = 500$. The \emph {optim} function returns fitted parameter values of $\beta = 0.0008018066, \gamma = 0.1273486, S_0 = 618$. This results in a SSE of 5120.06.\relax }}{37}
 \contentsline {figure}{\numberline {3.7}{\ignorespaces A) Reflection. B) Exansion. C) Outside contraction. D) Inside contraction. E) Shrink transformation\relax }}{39}
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Control flow of the basic model fitting framework\relax }}{43}
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Iterative model fitting over time using least squares minimisation.\relax }}{44}
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Iterative model fitting over time using least squares minimisation. I0, S0, beta and gamma unknown.\relax }}{45}
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Goodness of fit reduced when inaccurate parameter assumptions are made.\relax }}{45}
-\contentsline {figure}{\numberline {3.12}{\ignorespaces UML diagram of the model fitting framework\relax }}{46}
-\contentsline {figure}{\numberline {3.13}{\ignorespaces Graphical output of the C++ single model fitting framework. Beta = 0.001, gamma = 0.1, S0 = 1000, I0 = 1\relax }}{47}
-\contentsline {figure}{\numberline {3.14}{\ignorespaces 1) SIR model. 2) SEIR model. 3) Exponential decay model. 4) Modified SErIR model. 5) irSIR model\relax }}{49}
-\contentsline {figure}{\numberline {3.15}{\ignorespaces Dynamics of candidate models with similar parameters and starting susceptible population of 1000\relax }}{52}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Control flow of the basic model fitting framework\relax }}{42}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Iterative model fitting over time using least squares minimisation.\relax }}{43}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Iterative model fitting over time using least squares minimisation. I0, S0, beta and gamma unknown.\relax }}{44}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Goodness of fit reduced when inaccurate parameter assumptions are made.\relax }}{44}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces UML diagram of the model fitting framework\relax }}{45}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Graphical output of the C++ single model fitting framework. Beta = 0.001, gamma = 0.1, S0 = 1000, I0 = 1\relax }}{46}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces 1) SIR model. 2) SEIR model. 3) Exponential decay model. 4) Modified SErIR model. 5) irSIR model\relax }}{48}
+\contentsline {figure}{\numberline {3.15}{\ignorespaces Dynamics of candidate models with similar parameters and starting susceptible population of 1000\relax }}{51}
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Samples graphs of various candidate model fits (true parameter values in brackets): 1) SIR (0.0015,0.05,1000); 2) EXP (0.15,800); 3) SEIR (0.02,0.02,0.05,800); 4) irSIR (0.0003,0.0001,2000); 5) SErIR (0.005,0.002,0.002,0.01,1500)\relax }}{55}
+\contentsline {figure}{\numberline {3.17}{\ignorespaces Model fitting over time on an irSIR model with parameters of beta = 0.0001, gamma = 0.0005, and S0 = 2000\relax }}{56}
+\contentsline {figure}{\numberline {3.18}{\ignorespaces Model fits of an SErIR and SEIR model where unrealistic values provide a decent model fit\relax }}{56}
+\contentsline {figure}{\numberline {3.19}{\ignorespaces Fitting procedure on an SIR model where the model type is assumed to be unknown\relax }}{57}
+\contentsline {figure}{\numberline {3.20}{\ignorespaces Interchangeable selection of the similar SErIR and SEIR model types\relax }}{57}
+\contentsline {figure}{\numberline {3.21}{\ignorespaces Fitting procedure on the 2013-14 H1N1 CDC flu data\relax }}{58}
+\contentsline {figure}{\numberline {3.22}{\ignorespaces Fitting procedure on the 2010-11 AH3 CDC flu data, with I0 considered unknown\relax }}{59}
+\contentsline {figure}{\numberline {3.23}{\ignorespaces Fitting procedure on the 2013 viral hit, ``The Fox (What does the Fox say?)''\relax }}{60}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Multiple epidemic fitting procedure on two overlapping SIR models\relax }}{64}
 \addvspace {10\p@ }
 \addvspace {10\p@ }

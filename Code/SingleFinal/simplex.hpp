@@ -89,7 +89,7 @@ vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of objec
 			      D tol= 1E8*numeric_limits<D>::epsilon(), //termination criteria
 			      vector<vector<D> > x =  vector<vector<D> >(),
 			      //x: The Simplex
-			      int iterations=2E3
+			      int iterations=1E3
 			      ){
   
 

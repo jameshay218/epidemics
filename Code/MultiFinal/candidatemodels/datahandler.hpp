@@ -31,6 +31,7 @@ private:
   vector<vector<double> > baseModel, current_data, current_model, temp_model, empty_model, temp_data;
   vector<Epidemic*> epidemics, tempEpidemics;
   bool useMLE, optimT0, optimI0, singleEpi, plot, save,useLogistic;
+  bool activeBool = true;
   string saveLocation = "graphs/";
 public:
   Handler();
@@ -64,8 +65,8 @@ public:
   double dpois(vector<vector<double> > model, vector<vector<double> > data);
   double poisson_pmf(const double k, const double lambda);
   double fitEpidemicsMLE(vector<double> params);
-  vector<double> convert_parameters_back(vector<double> pars, int number);
-  vector<double> convert_parameters_forward(vector<double> pars, int number, int time);
+  vector<double> convert_parameters_back(vector<double> pars, int number, double detection, double lowerTime, double upperTime, bool isActive);
+  vector<double> convert_parameters_forward(vector<double> pars, int number, double time,double lowerTime, double upperTime, bool isActive);
   // Maths functions
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);
@@ -88,6 +89,8 @@ public:
 
   void realtime_fit_single(double targetRSq, EpiType _epi);
   double optimise_single(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults, int& itr);
+
+  void update_latest_epidemic(vector<double> finalParams);
 
 
   // Old functions

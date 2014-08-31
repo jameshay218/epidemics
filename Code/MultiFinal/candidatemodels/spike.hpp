@@ -25,6 +25,10 @@ public:
     
     pars.push_back(1);
     
+    minTime = detection - 1;
+    seedTime = detection;
+    detectionTime = detection + 1;
+
   };
   ~Spike();    
 

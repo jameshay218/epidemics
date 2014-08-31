@@ -484,66 +484,6 @@ within the objective function. This constrains the search space to
 between $0$ and $+\infty$, ensuring that we do not generate
 meaningless parameter vectors. 
 
-Another potential transformation that may be applied is through the
-use of the \emph{logistic} function. Originally studied in the context
-of population growth, maps the parameter search space from between $0$ and $1$
-to between $-\infty$ and $+\infty$. The function is
-defined as:
-\begin{equation}
-logistic(x)=\frac{1}{1+e^{-x}}
-\end{equation}
-The inverse of the logistic function, the \emph{logit} function, can
-therefore be used to map the search space of a parameter, \emph{p},
-from between $-\infty$ and $+\infty$ to between $0$ and $1$. The logit
-function is defined as:
-\begin{equation}
-logit(p) = log(\frac{p}{1-p})
-\end{equation}
-The logit function can be modifed to transform the search space from
-between $0$ and $1$ to one between $0$ and $max$ as follows:
-\begin{equation}
-newLogit(x) = \frac{max}{1+e^{-x}}
-\end{equation}
-with the inverse defined as:
-\begin{equation}
-newLogistic(x)=log(\frac{x}{max-x})
-\end{equation}
-
-The logic behind this modification can be expanded further to use the
-logistic function to provide lower bounds as well as upper bounds. As
-$x\rightarrow +\infty$, $logit(x)\rightarrow 1$. Similarly, as
-$x\rightarrow-\infty$, $logit(x)\rightarrow 0$. We can therefore modify
-the logistic function as follows:
-\begin{equation}
-f(x) = \frac{x_{max}-x_{min}}{1+e^{-x}} + x_{min}
-\end{equation}.
-
-We can see that as $x\rightarrow +\infty$, $f(x)\rightarrow x_{max}$,
-and as $x\rightarrow -\infty$, $f(x)\rightarrow x_{min}$. By limiting
-the parameter search space to a predetermined range of expected
-values, we ensure that the optimisation procedure does not get stuck
-in a local minimum far away from the actual parameter values. However,
-doing so requires us to make assumptions regarding where the real
-parameter values might lie. Whilst a good model fit might be produced
-within a provided range of parameter values, this fit might be sub
-optimal compared to the model produced from a set of entirely
-unexpected parameters. 
-
-An alternative, simple approach to bounding parameter values in the
-optimisation procedure is to modify the results returned by the
-objective function. As the Nelder Mead algorithm transforms parameter
-values with the aim of minimising the objective function, we can
-direct the parameter search by ensuring that the objective function
-returns high values when venturing into an undesirable parameter
-space. For example, we can include a simple check of each parameter
-with each call of the objective function; returning a high SSE value
-if the parameter is outside our desired range. This method was
-implemented initially; however, it appeared to result in the Nelder
-Mead algorithm returning nonsense values more frequently as it failed
-to identify any local minima. This is due to the fact that the
-optimisation surface becomes much less smooth, as each check outside
-of the specified bounds results in a sudden spike in function value.  
-
 
 \section{Evaluating Goodness of Fit}
 Although the SSE provides a value which the optimisation process can
@@ -738,6 +678,12 @@ S0 are assumed to be unknown.
   framework. Beta = 0.001, gamma = 0.1, S0 = 1000, I0 = 1}
 \label{fig:sirc}
 \end{figure}
+
+\section{Maximum Likelihood Based Estimation}
+
+
+
+
 
 
 \section{Alernative Candidate Models}
@@ -948,6 +894,256 @@ be representative of the entire data set, we perform this selection
 every 10 data points to ensure that the best model is chosen in light
 of recent data. 
 
-\section{Maximum Likelihood Based Estimation}
-An alternative to least squares based fitting is the use of Maximum
-Likelihood Estimation (MLE) as an objective function. The theory  ,
+\section{Initial Results}
+Due to the much greater speed of the C++ implementation along with
+comparable fitting accuracy, we present here the initial results of
+the various candidate model fitting frameworks from the C++
+implementation. A more detailed comparison of the two implementations
+is provided in section EVALUATION. The single model fitting framework
+was first tested in its ability to fit synthetic epidemic data of known
+parameters and types. We then go on to see how well the \emph{AICc}
+model selection criteria is able to identify the correct model
+type. Finally, we test our implementation on real influenza data from
+the H1N1 virus during the 2013-2014 season and the number of
+\emph{BitTorrent} downloads of the briefly viral ``\emph{The Fox (What Does the
+  Fox Say?)}'' song.
+
+\subsection{Known Model Types}
+The model fitting framework is able to accurately and consistently fit
+all five types of candidate model at each time point, as depicted in figure~\ref{fig:single1}. All of the
+R Square values are upwards of 0.98, which shows a very high level of
+model fit, and the model fit remains high throughout the fitting
+procedure as shown in figure~\ref{fig:single2}. Even in the case of the more complex \emph{SErIR} and
+\emph{SEIR} model, the framework is able to produce a good model
+fit. An important observation is that the framework provides an
+optimised fit to only the available data points. This has implications
+for the framework's predictive ability, which will often over or under
+estimate the peak of the epidemic based. Furthermore, due to the
+variation provided by the \emph{GillespieSSA} algorithm, the best
+fitting model at some time points does not necessarily match the
+true data parameters. However, once the epidemic peak has been
+reached, the framework is able to find values close to the true
+parameters and to predict the future dynamics of the epidemic with
+good accuracy. 
+
+In the case of the \emph{SErIR} and occasionally the \emph{SEIR} model, the model fitting
+framework occasionally produces a model fit with parameter values that
+are quite different to the true values. This isn't particularly
+surprising, as the higher number of parameters results in a higher
+number of high fitting models due to the highly malleable curve shape.
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/sir1.png}
+  \includegraphics[width=8cm]{images/single/exp1.png}
+  \includegraphics[width=8cm]{images/single/seir1.png}
+  \includegraphics[width=8cm]{images/single/irsir1.png}
+  \includegraphics[width=8cm]{images/single/serir1.png}
+\caption{Samples graphs of various candidate model fits (true
+  parameter values in brackets): 1) SIR
+  (0.0015,0.05,1000); 2) EXP (0.15,800); 3) SEIR (0.02,0.02,0.05,800);
+  4) irSIR (0.0003,0.0001,2000); 5) SErIR (0.005,0.002,0.002,0.01,1500)}
+\label{fig:single1}
+  \end{figure}
+\end{centering}
+
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/ex1.png}
+  \includegraphics[width=8cm]{images/single/ex2.png}
+  \includegraphics[width=8cm]{images/single/ex3.png}
+  \includegraphics[width=8cm]{images/single/ex4.png}
+  \caption{Model fitting over time on an irSIR model with parameters of
+    beta = 0.0001, gamma = 0.0005, and S0 = 2000}
+\label{fig:single2}
+  \end{figure}
+\end{centering}
+
+One important observation that was made when testing the single
+epidemic fitting framework was that the optimisation procedure
+occasionally settles on values widely outside of a realistic range
+that still provide a good model fit. This was particularly prevalent
+at earlier data points for the more complex models, possibly due to
+the much larger parameter search space. Figure~\ref{fig:single3} shows
+some examples of this problem. In the case of the first \emph{SErIR}
+graph, the S0 value is found to be almost 17000000000, which greatly
+differs from the true value of 1500. The algorithm is able to still
+provide a decent fit by using very high recovery values (mu and
+gamma). A solution to this problem that is explored in the next
+chapter when fitting multiple epidemics is to bound the possible
+parameter search space to a pre defined realistic range.
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/bad1.png}
+  \includegraphics[width=8cm]{images/single/bad2.png}
+  \caption{Model fits of an SErIR and SEIR model where unrealistic
+    values provide a decent model fit}
+\label{fig:single3}
+  \end{figure}
+\end{centering}
+
+
+\subsection{Unknown Model Types}
+The next step in testing the model fitting framework is to assess how
+well it is able to choose the correct model type for a given data set
+when the model type is entirely unknown. At the start of the fitting
+procedure, the best of twenty optimised fits are found for each
+candidate model, and the model which produces the lowest \emph{AICc}
+value is chosen as the correct model. To prevent the framework from
+becoming stuck with the wrong model type early on in the fitting
+process, we reconsider each candidate model every ten data points.
+
+The model fitting framework still manages to produce a good model fit
+for each of the tested synthetic data sets. In the case of the synthetic
+\emph{SIR} data, the fitting framework is able to correctly select the
+\emph{SIR} model. This is depicted in figure~\ref{fig:unknown1}, where
+despite choosing to use an \emph{SErIR} model at one point during the
+fitting procedure, the framework is able to correctly return to using
+an \emph{SIR} model. It should be noted that the best fitting model
+type might vary over the course of the run due to variation in the
+data itself.
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/unknown.png}
+  \includegraphics[width=8cm]{images/single/unknown1.png}
+  \includegraphics[width=8cm]{images/single/unknown2.png}
+  \includegraphics[width=8cm]{images/single/unknown3.png}
+  \caption{Fitting procedure on an SIR model where the model type is
+    assumed to be unknown}
+\label{fig:unknown1}
+  \end{figure}
+\end{centering}
+
+Despite penalising more complex models using the \emph{AICc} criteria, the
+fitting framework often selects an \emph{SIR} model in place of an
+\emph{EXP} model. This is unsurprising, as the \emph{EXP} model is
+simply a special case of the \emph{SIR} model when beta is very high
+(and susceptible individuals therefore move into the infected
+compartment almost instantly). Furthermore, we see in
+figure~\ref{fig:unknown2} that the framework
+often chooses between the \emph{SErIR} and \emph{SEIR} interchangeably. Again,
+the two models are closely related. As mu tends to 0, the \emph{SErIR}
+model tends to the equivalent \emph{SEIR} model. 
+
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/unknownwrong1.png}
+  \includegraphics[width=8cm]{images/single/unknownwrong2.png}
+  \caption{Interchangeable selection of the similar SErIR and SEIR
+    model types}
+\label{fig:unknown2}
+  \end{figure}
+\end{centering}
+
+
+Although all of the models can produce similar shapes due to their high level of
+similarity, we would still expect the \emph{AICc} criteria to penalise
+any model that is unecessarily complex such that the simplest model is
+chosen. This case is only satisfied in the situation that a maximally
+optimised fit is produced for each candidate model. However, by
+choosing random parameters to start each optimisation, the
+optimisation might return slightly sub optimal parameters some of the
+time. For example, the best run from random parameters for an
+\emph{SIR} model might produce an R Square of 0.97, whereas the run
+using an \emph{SErIR} model might produce a fit of 0.99 simply as a
+result of being seeded with better initial parameters. 
+
+The problem of incorrect model selection might be countered
+by using a greater number of random runs and by decreasing the error
+tolerance of the Nelder-Mead algorithm to ensure that all model fits
+find the global minimum rather than a similar local
+minimum. Similarly, we might also increase the max number of
+iterations allowed in the Nelder-Mead algorithm, but this limit is
+not currently reached. However, these adjustments will drastically increase the amount of time taken for a full optimisation
+run. This therefore represents an important trade off to be considered when deploying
+the fitting framework. Another potential solution would be to use
+alternative means of model selection. The \emph{AICc} score may not
+sufficiently penalise more complex models when the difference in
+number of parameters is minimal and the number of data points is
+high. An alternative might be to simply select the model with the
+fewest parameter that satisfies some desired fit value.
+
+
+\subsection{CDC Influenza Data}
+To put the model fitting framework to the test, we attempt to
+characterise the CDC infected data for the H1N1 virus during 2013 to
+2014. The fitting framework is able to choose and fit a model to the
+data with very high accuracy, selecting the \emph{SIR} model for the
+duration of the fitting procedure, and generating an R Square value of
+over 0.99 consistently once the peak is reached. The predicted
+trajectory of the epidemic matches the future data well.
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/h1n1.png}
+  \includegraphics[width=8cm]{images/single/h1n1b.png}
+  \includegraphics[width=8cm]{images/single/h1n1c.png}
+  \includegraphics[width=8cm]{images/single/h1n1d.png}
+  \caption{Fitting procedure on the 2013-14 H1N1 CDC flu data}
+\label{fig:unknown2}
+  \end{figure}
+\end{centering}
+
+We go on to test the fitting framework on the AH3 virus during 2010 to
+2011, but this time include the initial number of infected
+individuals, I0, as an additional unknown parameter. Again, the
+framework is able to characterise the data with a high R Square value
+throughout. In this case, the type of model chosen changes during the
+fitting, but settles on a high fitting \emph{SIR} model by the end.
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/ah3.png}
+  \includegraphics[width=8cm]{images/single/ah3b.png}
+  \includegraphics[width=8cm]{images/single/ah3c.png}
+  \includegraphics[width=8cm]{images/single/ah3d.png}
+  \caption{Fitting procedure on the 2010-11 AH3 CDC flu data, with I0
+    considered unknown}
+\label{fig:unknown3}
+  \end{figure}
+\end{centering}
+
+
+\subsection{Internet Epidemic Data}
+In addition to conventional infectious disease epidemic data, we wish
+to test how well the model fitting framework can characterise epidemic
+phenomena on the internet. Figure~\ref{fig:fox1} shows the application
+of the fitting framework to the number of daily \emph{BitTorrent}
+downloads of the viral song ``\emph{The Fox (What does the Fox say?}''
+between September 2013 and August 2014. The large peak corresponds to
+the single release in Norway on October 11th 2013. The framework
+detects and characterises the initial small peak accurately, and
+adapts to characterise the overall peak as the fitting procedure
+continues. By the end of the fitting, the framework has characterised
+the data with an \emph{SErIR} model with an R Square value of 0.909.
+
+
+\begin{centering}
+\begin{figure}[h!]
+  \includegraphics[width=8cm]{images/single/fox1.png}
+  \includegraphics[width=8cm]{images/single/fox2.png}
+  \includegraphics[width=8cm]{images/single/fox3.png}
+  \includegraphics[width=8cm]{images/single/fox4.png}
+  \caption{Fitting procedure on the 2013 viral hit, ``The Fox (What
+    does the Fox say?)''}
+\label{fig:fox1}
+  \end{figure}
+\end{centering}
+
+
+\section{Chapter Summary}
+In this section we have discussed the implementation and trial of an R
+and C++ model fitting framework. The C++ framework is implemented from
+scratch, using the Runge-Kutta method for solving ODEs, and the Nelder
+Mead algorithm for optimisation. We assume that the transition
+parameters and initial number of susceptibles, S0, are entirely
+unknown, and also consider the case where I0 is known. We include five types of candidate
+model and attempt to select the best fitting model using the
+\emph{AICc} score, and show reasonable success. The framework is
+tested using synthetic data, real influenza data, and
+\emph{BitTorrent} download data. In all cases we are able to provide a
+model with a high R Square fit.

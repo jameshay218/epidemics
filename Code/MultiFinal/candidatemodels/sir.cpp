@@ -27,8 +27,8 @@ vector<vector<double> > SIR::ode_solve_combined(vector<double> parameters){
   beta = parameters[0];
   gamma = parameters[1];
   populations[0] = parameters[2];
-  t0 = parameters[3];
-  //t0 = detectionTime;
+  if(active) t0 = parameters[3];
+  else (t0) = detectionTime;
   populations[1] = 1.0;
   populations[2] = 0.0;
   Solve_Eq_total(temp_model, 1);
@@ -42,8 +42,8 @@ vector<vector<double> > SIR::ode_solve(vector<double> parameters){
   beta = parameters[0];
   gamma = parameters[1];
   populations[0] = parameters[2];
-  t0 = parameters[3];
-  //t0 = detectionTime;
+  if(active) t0 = parameters[3];
+  else t0 = detectionTime;
   populations[1] = 1.0;
   populations[2] = 0.0;
   Solve_Eq_t0(temp_model, 1);

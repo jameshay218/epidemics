@@ -21,8 +21,9 @@ protected:
   vector<double> dPop, dPop1, dPop2, dPop3, dPop4, tmpPop, initialPop, populations;
   vector<double> pars;
   vector<vector<double> > current_data, temp_model, total_model;
-  int noPops, diffIndex, detectionTime, seedTime, minTime; //resize the pop vectors to fit this
+  int noPops, diffIndex, detectionTime,detectionTimeTemp, seedTime, minTime, optimTime,parSize; //resize the pop vectors to fit this
   EpiType type;
+  bool active;
 
 public:
   int infectedIndex;
@@ -31,13 +32,17 @@ public:
   virtual ~Epidemic() = 0;
 
   vector<double> return_parameters();
+  int return_param_size(){return(parSize);}
   EpiType return_type() { return type;};
   int return_detection_time(){return detectionTime;};
   int return_seed_time(){return seedTime;};
   int return_min_time(){return minTime;};
   void update_data(vector<vector<double> > x);
   void reset_models(int size);
-
+  void deactive_epidemic(){active=false; detectionTime = optimTime;};
+  void active_epidemic(){ active = true; detectionTime = detectionTimeTemp;}
+  bool is_active(){return(active);}
+  void update_time(double optTime) { cout << "Best time is: " << optTime << endl; optimTime=optTime;}
   /* NORMAL ODE SOLVER */
   virtual void Diff(vector<double> Pop) = 0;
   void Runge_Kutta();

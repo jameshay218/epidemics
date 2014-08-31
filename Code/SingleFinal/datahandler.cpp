@@ -68,7 +68,7 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
   t1=clock();
   srand(time(NULL));
 
-  candidateModels.push_back(spike);
+  //  candidateModels.push_back(spike);
   candidateModels.push_back(sir);
   candidateModels.push_back(serir);
   candidateModels.push_back(irsir);
@@ -87,7 +87,7 @@ void Handler::realtime_fit_single(double targetRSq, EpiType _epi){
   print_epidemic_type(_epi);
 
   finalParams = tempPar = generate_seed_parameters();
-  for(unsigned int i = 5;i<this->current_data.size();++i){
+  for(unsigned int i = 7;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
@@ -829,7 +829,7 @@ vector<double> Handler::rand_params(EpiType _type){
   
   setprecision(9);
  
-  s0 = rand()%20000+200;
+  s0 = rand()%100000+1000;
   i0 = rand()%20+1;
 
   switch(_type){
