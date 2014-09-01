@@ -33,6 +33,10 @@ public:
     populations[2] = 1.0;
     populations[3] = 0.0;
     pars.push_back(1);
+
+    minTime = detection - 50;
+    seedTime = detection - 10;
+
   };
   ~SERIR();    
  

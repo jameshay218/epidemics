@@ -28,7 +28,7 @@ public:
 
     pars.push_back(1);
     minTime = detection - 40;
-    seedTime = detection - 5;
+    seedTime = detection - 10;
 
   };
   ~SIR();    

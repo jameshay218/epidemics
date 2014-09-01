@@ -31,8 +31,13 @@ private:
   vector<vector<double> > baseModel, current_data, current_model, temp_model, empty_model, temp_data;
   vector<Epidemic*> epidemics, tempEpidemics;
   bool useMLE, optimT0, optimI0, singleEpi, plot, save,useLogistic;
-  bool activeBool = true;
+  bool activeBool = false;
   string saveLocation = "graphs/";
+  double betaupper, betalower, gammalower, gammaupper;
+  double betaSeirUp,betaSeirDown,gammaSeirDown,gammaSeirUp,alphaSeirUp,alphaSeirDown;
+  double betaIrsirUp,betaIrsirDown,gammaIrsirDown,gammaIrsirUp;
+  double betaSerirUp,betaSerirDown,gammaSerirDown,gammaSerirUp,alphaSerirUp,alphaSerirDown,muSerirUp,muSerirDown;
+  double gammaExpUp,gammaExpDown;
 public:
   Handler();
   ~Handler();
@@ -65,8 +70,12 @@ public:
   double dpois(vector<vector<double> > model, vector<vector<double> > data);
   double poisson_pmf(const double k, const double lambda);
   double fitEpidemicsMLE(vector<double> params);
-  vector<double> convert_parameters_back(vector<double> pars, int number, double detection, double lowerTime, double upperTime, bool isActive);
-  vector<double> convert_parameters_forward(vector<double> pars, int number, double time,double lowerTime, double upperTime, bool isActive);
+  vector<double> convert_parameters_back(vector<double> pars, int number, double detection, double lowerTime, double upperTime, bool isActive,EpiType _type);
+  vector<double> convert_parameters_forward(vector<double> pars, int number, double time,double lowerTime, double upperTime, bool isActive,EpiType _type);
+
+  void deactivate_epidemics();
+  void activate_last_epidemic();
+  void save_all_results(vector<vector<double> > saveResults, vector<EpiType> selectedTypes);
   // Maths functions
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);
@@ -91,7 +100,7 @@ public:
   double optimise_single(vector<double> &parameters, vector<vector<double> > &results, vector<vector<vector<double> > > &allResults, int& itr);
 
   void update_latest_epidemic(vector<double> finalParams);
-
+  void initial_param_bound();
 
   // Old functions
   void testAddition(vector<vector<double> > data1, vector<vector<double> > data2, double offset);
@@ -101,8 +110,7 @@ public:
   bool check_already_tested(vector<EpiType> tested, EpiType toCheck);
   vector<Epidemic*> copy_epidemics(vector<Epidemic*> epi);
   double calculate_SSE(vector<vector<double> > data1, vector<vector<double> > data2);
-  vector<double> generate_seed_parameters_old();
-  vector<double> rand_params_old(EpiType _type);
+
 };
 
 

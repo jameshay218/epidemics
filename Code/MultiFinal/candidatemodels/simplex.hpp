@@ -89,13 +89,13 @@ vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of objec
 			      D tol= 1E11*numeric_limits<D>::epsilon(), //termination criteria
 			      vector<vector<D> > x =  vector<vector<D> >(),
 			      //x: The Simplex
-			      int iterations=1E3
+			      int iterations=2E3
 			      ){
   
 
   int N=init.size(); 
   //space dimension
-  const double a=1.0, b=1.0, g=0.5, h=0.5;   //coefficients
+  const double a=1.2, b=2.0, g=0.4, h=0.4;   //coefficients
   //a: reflection  -> xr  
   //b: expansion   -> xe 
   //g: contraction -> xc

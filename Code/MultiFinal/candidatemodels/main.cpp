@@ -151,7 +151,7 @@ int main() {
     cout << "--------------------------------------------------------------------" << endl;
     //      boolT0 = false;
     dataHandler.update_options(mle,boolT0,boolI0,singleEpidemic,savePlot,saveResults,saveLocation, logistUse);
-    dataHandler.realtime_fit_multi(0.95);
+    dataHandler.realtime_fit_multi(0.9);
    
   }
   return(0); 
