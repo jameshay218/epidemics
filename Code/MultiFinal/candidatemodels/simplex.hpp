@@ -95,7 +95,7 @@ vector<D> Simplex::neldermead(X(OP::*f)(vector<D>),   //target function of objec
 
   int N=init.size(); 
   //space dimension
-  const double a=1.2, b=2.0, g=0.4, h=0.4;   //coefficients
+  const double a=1.1, b=1.5, g=0.4, h=0.4;   //coefficients
   //a: reflection  -> xr  
   //b: expansion   -> xe 
   //g: contraction -> xc

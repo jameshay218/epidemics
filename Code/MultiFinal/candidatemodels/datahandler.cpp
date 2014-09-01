@@ -69,8 +69,8 @@ void Handler::realtime_fit_multi(double targetRSq){
   candidateModels.push_back(spike);
   candidateModels.push_back(sir);
   candidateModels.push_back(seir);
-  candidateModels.push_back(serir);
-  candidateModels.push_back(irsir);
+  //  candidateModels.push_back(serir);
+  //  candidateModels.push_back(irsir);
  
   // Start of model fitting process
   t1=clock();
@@ -81,18 +81,18 @@ void Handler::realtime_fit_multi(double targetRSq){
     this->temp_data.push_back(this->current_data[j]);
   }
   this->baseModel = this->current_model = base_model(this->temp_data);
-
-  //epidemics.push_back(new_epidemic(sir,10.0));
-  // epidemicSizes.push_back(4);
+  /*
+   epidemics.push_back(new_epidemic(sir,6.0));
+   epidemicSizes.push_back(4);
   
-  /*epidemics.push_back(new_epidemic(spike,28.0));
+  epidemics.push_back(new_epidemic(spike,29.0));
   epidemicSizes.push_back(3);
-  epidemics.push_back(new_epidemic(sir,60.0));
-  epidemicSizes.push_back(4);
+  epidemics.push_back(new_epidemic(spike,44.0));
+  epidemicSizes.push_back(3);
   */
 
   // For each time point in the current data set, carry out the fitting procedure
-  for(unsigned int i = 7;i<this->current_data.size();++i){
+  for(unsigned int i = 5;i<this->current_data.size();++i){
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
@@ -1264,7 +1264,7 @@ vector<Epidemic*> Handler::copy_epidemics(vector<Epidemic*> epi){
 void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, int column){
 
   Gnuplot gp;   // Need instance of the Gnuplot class to pipe commands to gnuplot
-  string name = "ROBINALL/output"; // The save location and general name of the graph to be saved
+  string name = saveLocation + "/output"; // The save location and general name of the graph to be saved
   string _index = to_string((index-1));
   string label, xlab, ylab,xlab2;
   string colours[6] = {"blue","red","orange","cyan","violet","yellow"};
