@@ -32,6 +32,7 @@ public:
     pars.push_back(1);
     minTime = detection-40;
     seedTime = detection-10;
+    step = 0.1;
   };
   ~SEIR();    
  

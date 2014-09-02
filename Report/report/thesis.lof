@@ -35,5 +35,8 @@
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Multiple epidemic fitting procedure on an SIR and EXP models with logistic bounding\relax }}{67}
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Multiple epidemic fitting procedure on the number of \emph {BitTorret} downloads of the song ``Blurred Lines'' by Robin Thicke. Number of downloads on the y-axis and day on the x-axis\relax }}{69}
 \contentsline {figure}{\numberline {4.5}{\ignorespaces Second multiple epidemic fitting procedure on ``Blurred Lines'' download data using additional logistic binding and modified Nelder-Mead algorithm \relax }}{70}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Synthedemic Fitting Framework Function\relax }}{72}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Epidemic Optimisation Function\relax }}{73}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces ODE Solving Function\relax }}{73}
 \addvspace {10\p@ }
 \addvspace {10\p@ }

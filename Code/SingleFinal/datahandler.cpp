@@ -11,6 +11,9 @@ using namespace std;
 #include <string>
 
 const float EPSILON = 0.1;
+const double upperS0 = 150000;
+const double lowerS0 = 10;
+
 
 Handler::Handler(){
   useMLE = false;
@@ -47,6 +50,14 @@ void Handler::update_options(bool mle, bool useT0, bool useI0, bool _singleEpi, 
 }
 
 
+void Handler::sense_check(vector<vector<double> > &model){
+  if(model[0][1] > 100000 || model[0][1] <0 || (model[0][1] != model[0][1])) model[0][1] = 0;
+  for(unsigned int j = 1;j<model.size();++j){
+    if(model[j][1] > 100000 || model[j][1] <0 || (model[j][1] != model[j][1])){
+      model[j][1] = model[j-1][1];
+    }
+  }
+}
 
 
 /* ================================ FINAL LEAST SQUARES ============================= */
@@ -564,7 +575,8 @@ double Handler::fitEpidemics(vector<double> params){
     }
     
     //if(!params_check(tempParams, epidemics[i]->return_type())) return(999999999999.9);
-    temp_model = epidemics[i]->ode_solve(tempParams);  
+    temp_model = epidemics[i]->ode_solve(tempParams);
+    sense_check(temp_model);  
     current_model = combine_vectors(current_model, temp_model);
   }
    return(calculate_SSE(current_model, temp_data));
@@ -581,6 +593,7 @@ double Handler::fitEpidemics(vector<double> params){
        z++;
      }
      temp_model = epidemics[i]->ode_solve(tempParams);
+     sense_check(temp_model);
      current_model = combine_vectors(current_model, temp_model);
    }
    return(dpois(current_model, temp_data));
@@ -600,6 +613,7 @@ double Handler::fitEpidemics(vector<double> params){
      }
 
      temp_model = epidemics[i]->ode_solve(tempParams);
+     sense_check(temp_model);
      overallResults = combine_vectors(overallResults,temp_model);
    }
    
@@ -616,6 +630,7 @@ double Handler::fitEpidemics(vector<double> params){
        tempParams.push_back(epidemics[i]->return_parameters()[z]);
      }
      temp_model = epidemics[i]->ode_solve(tempParams);
+     sense_check(temp_model);
      separateResults.push_back(temp_model);
    }
    return(separateResults);

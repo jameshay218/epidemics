@@ -30,7 +30,7 @@ vector<vector<double> > IRSIR::ode_solve_combined(vector<double> parameters){
   if(active) t0 = parameters[3];
   else t0 = detectionTime;
   populations[1] = 1.0;
-  populations[2] = 0.0;
+  populations[2] = 1.0;
   Solve_Eq_total(temp_model, 1);
   return(temp_model);
  }
@@ -44,7 +44,7 @@ vector<vector<double> > IRSIR::ode_solve(vector<double> parameters){
   if(active) t0 = parameters[3];
   else t0 = detectionTime;
   populations[1] = 1.0;
-  populations[2] = 0.0;
+  populations[2] = 1.0;
   Solve_Eq_t0(temp_model, 1);
   return(temp_model);
 }

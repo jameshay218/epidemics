@@ -34,7 +34,7 @@ public:
     populations[3] = 0.0;
     pars.push_back(1);
 
-    minTime = detection - 50;
+    minTime = detection - 40;
     seedTime = detection - 10;
 
   };

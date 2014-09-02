@@ -27,8 +27,8 @@ public:
     populations[2] = 0.0;
 
     pars.push_back(1);
-    minTime = detection - 50;
-    seedTime = detection - 10;
+    minTime = detection - 20;
+    seedTime = detection - 5;
 
   };
   ~IRSIR();    

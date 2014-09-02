@@ -26,7 +26,7 @@ of the project.
 \section{Identifying Sub Epidemic Start Time}
 In the single epidemic fitting framework, it is assumed that there is
 only one epidemic in the dataset, and that it can be considered to
-have started right from the start of the data, $t_0$. However, when
+have started right at the beginning of the dataset. However, when
 considering multiple epidemics simultaneously, it is not possible to
 make this assumption, as multiple sub epidemics might start and finish during
 the iterative fitting procedure. Furthermore, when multiple epidemics
@@ -38,7 +38,56 @@ synthedemic model fitting framework is therefore to implement a means
 to detect and record epidemic start times, and to consider how these
 start times will be included in the optimisation procedure.
 
+
+
 \subsection{Epidemic Detection}
+The aim of detecting an epidemic outbreak is to determine when the
+level of infected individuals has begun to rise above the expected
+baseline level. In most cases, there will be a certain number of
+background infecteds that are endemic in the population. For example,
+consider that there will be some individuals infected with flu
+throughout the year. The first step in our detection procedure is
+therefore to establish a baseline level, taken as the mean of the data
+points up until detection.
+
+At each time point, residuals are generated from the difference
+between the current best fitting model and the available data. If
+there are no active epidemics, the best fitting model is taken as the
+baseline level. We then check the latest residual for signs of an
+epidemic outbreak. If the latest residual lies a certain number of
+standard deviations away from the mean of the previous residuals, then
+we suspect that an outbreak might have occured. As the detection
+procedure is dependent on the variation in the past residuals, the sensitivity of
+outbreak detection is dependent on the noise of the data itself. If
+the data set shows very low variation, then the standard deviation of
+the residuals will be low; resulting in a low detection
+threshold. Similarly, if the standard deviation is very high (as might
+be the case with real world data), then the threshold will be very
+high. In terms of implementation, we therefore couple the residual
+detection threshold with a measure of the current model fit. If the
+current model fit is less than a certain value, then the model fit has
+deteriorated sufficiently to consider the addition of another sub
+epidemic.
+
+Although the above detection method is a sound heuristic approach, the
+dependence on the quality of the data means that detection time may
+be inaccurate. When the outbreak begins gradually, the change to the
+mean and standard deviation of the residuals may be small enough that
+the latest residual is never outside of the detection
+range. In epidemic outbreaks of infectious diseases, proxies for
+detection might be used in place of analysing the epidemic data
+itself. Please refer to section EVALUATION for further discussion of
+alternative approaches to outbreak detection.
+
+
+ For example, the World Health Organisation gathers reports and
+rumours of suspected outbreaks from various informal sources and
+national health organisations in the hopes of
+investigating and catching a potential outbreak as early as
+possible. CITE WHO. One tool used by the WHO is the Global Public
+Health Intelligence Network
+
+
 
 \subsection{Optimising Epidemic Start Times}
 Once an epidemic outbreak has been detected, the next challenge is to
@@ -374,13 +423,185 @@ reduced by taking every fourth data point to reduce run time.
 \end{centering}
 
 The updated implementation provides a much better fit throughout the
-course of the run, and accurately locates the initiation of 
+course of the run, and accurately locates the start of constituent
+epidemics. Interestingly, these sub epidemics can be ascribed to real
+world events that resulted in the sudden expose of ``Blurred
+Lines''. The initial SIR shaped epidemic seems to be a result of the
+initial video upload in March 2013. The second, larger spike epidemic
+immediately follows the exposure of Robin Thicke on the US television
+show, ``Jimmy Kimmel Live''. Another epidemic is detected at around
+day 200, which coincides with the live performance of ``Blurred
+Lines'' on the 2013 ``MTV Video Music Awards''. Finally, the final
+epidemic at around day 250 immediately follows Robin Thicke's appearance on the TV show ``X Factor''.  
 
 
-\section{Real Data Testing}
-- Present synthetic data
-- Present real influenza data
-- Present Robin Thicke data final
-- any others?
+
+\section{Implementation Summary}
+The model fitting framework proposed in figure~\ref{fig:uml} was
+adapted to form the final synthedemic fitting framework. The flow of
+control is summarised as follows:
+
+\begin{enumerate}
+\item An instance of the Datahandler class imports the desired
+  epidemic data from a .csv file into a vector.
+\item The Datahandler object begins the iterative fitting procedure
+  with a target R Square value, as shown in \ref{fig:realtime}.
+\item The fitting procedure starts with no epidemics, and attempts to
+  find an optimal synthedemic model fit to the currently available
+  data at each time point. This is done by passing the objective
+  function in \ref{fig:objective} to an instance of the ``Nelder
+  Mead'' class.
+\item To prevent overfitting, the framework also attempts to optimise
+  all possible $k-1$ epidemic combinations at each time point. If the
+  resulting R Square value is above the threshold, the epidemic is
+  permanently removed.
+\item If the R Square value is below the desired threshold and a new
+  epidemic outbreak has been detected, we
+  consider adding each candidate model. We then choose to add the
+  model with the lowest AICc score.
+\item At the end of each time point, we plot the results of the
+  optimisation and reset all temporary parameters.
+\end{enumerate}
+
+The Datahandler class stores a number of attributes that are used in the
+optimisation procedure. For example, the currently avaiable data, the current best
+fitting model and a vector of Epidemic objects. The reasoning behind
+storing so many variables as properties rather than declaring them
+locally is to speed up the optimisation procedure. The presented
+implementation also uses logistic bounding on all parameters within a
+sensible range to reduce the chance of the optimisation algorithm from
+getting stuck in a bad local minima. The start time of each epidemic,
+$t_0$ is also included in the optimisation procedure. By using
+different bounds for each Epidemic sub class, we are able to limit the
+parameter search space for each sub epidemic depending on the epidemic
+type.
+
+\begin{algorithm}
+  \captionof{figure}{Synthedemic Fitting Framework Function}
+  \begin{algorithmic}
+    \Function{realtime\_model\_fit}{targetRSq, data} 
+    \State //\emph{Begin the iterative procedure}
+    \For{i = 0 to length(data)}
+    \State //\emph{Get currently available data}
+    \State availableData = data[1:i]\\
+    \State //\emph{Optimise current set of $k$ epidemics to data}
+    \State (optimParams, modelResults, RSquare, AICc) =
+      optimiseEpidemics(availableData, epidemics)
+      \\
+      \If{RSquare \textgreater targetRSq}
+      \For{j = 0 to length(epidemics)}
+        \State tempEpidemics = fewer\_epidemics(j);\\
+        \State //\emph{Optimise for $k-1$ epidemics}
+        \State (tempParams, tempModel, tempRSquare, tempAICc) =
+        optimiseEpidemics(availableData, tempEpidemics);\\
+        \State //\emph{If fit sufficient, track this epidemic for removal}
+        \If{tempAICc \textless AICc \& tempRSquare \textgreater
+          targetRSq}
+        \State //\emph{Store results for $k-1$ epidemics}
+        \EndIf
+        \State tempEpidemics = epidemics;
+        \EndFor
+        \EndIf
+      \State remove\_epidemic(toRemove);
+      \\
+      \State //\emph{Check residuals for new outbreak}
+      \State residuals = get\_residuals(availableData, modelResults);
+      \State newEpidemic = check\_for\_epidemic();
+   \\ 
+   \State //\emph{If an epidemic was detected and the current fit is
+     insufficient, attempt to add an epidemic}
+   \If{newEpidemic != true \& RSquare \textless targetRSquare}
+   \State tempEpidemics = epidemics;
+   \\
+   \State //\emph{Check the addition of each candidate model}
+   \For{j = 0 to length(candidateModels)}
+   \State tempEpi = newEpidemic(candidateModels[j]);
+   \State tempEpidemics.push\_back(tempEpidemic);\\
+   \State //\emph{Optimise for $k+1$ epidemics}
+   \State (tempParams, tempResults, tempRSquare, tempAICc) = optimiseEpidemics(availableData, tempEpidemics);
+   \If{tempAICc \textless AICc \& tempRSquare \textgreater
+     targetRSq}
+   \State toAdd = tempEpi;
+   \State //\emph{Store results for $k+1$ epidemics}
+   \EndIf
+   \EndFor
+   \EndIf\\
+   \If{toAdd != NULL} epidemics.push\_back(toAdd); \EndIf
+   \EndFor
+   \EndFunction
+  \end{algorithmic}
+  \label{fig:realtime}
+  \end{algorithm}
+
+Note that at each time point that an epidemic is detected, we test the
+model fit when each sub epidemic is removed. An alternative, simpler
+approach would be to only consider removing the last epidemic at each
+time point. Although this would improve the speed of the fitting
+procedure, we risk leaving in superfluous sub epidemics from early on
+in the fitting procedure. Including $t_0$ in the optimisation also
+improves the ability of the remaining sub epidemics to compensate for
+dropping an epidemic.
+
+\begin{algorithm}
+  \captionof{figure}{Epidemic Optimisation Function}
+  \begin{algorithmic}
+    \Function{optimise\_epidemics}{epidemics, availableData}
+    \If{length(epidemics) == 0}
+    \State model = baseline\_model(availableData);
+    \State RSquare = calculate\_RSquare(model, availableData);
+    \State AICc = calculate\_AICc(model, availableData);
+    \State finalParams = ();
+    \Else
+    \State//\emph{Perform 10 random fits and choose best fitting run}
+    \For{i = 0 to 10}
+    \State seedParams = generate\_seed\_parameters();
+    \State logit\_transform\_parameters(seedParams);
+    \State (tempParams, tempSSE) = neldermead\_optim(*ode\_solve\_sse, seedParams);
+    \If{tempSSE \textless SSE}
+    \State SSE = tempSSE;
+    \State finalParams = tempParams;
+    \EndIf
+    \EndFor
+    \State model = ode\_solve(finalParams);
+    \State AICc = calculate\_AICc(model, availableData);
+    \State RSquare = calculate\_RSquare(model, availableData);
+    \Return (finalParams, model, RSquare, AICc);
+    \EndIf
+    \EndFunction
+  \end{algorithmic}
+\label{fig:optimise}
+\end{algorithm}
 
 
+\begin{algorithm}
+  \captionof{figure}{ODE Solving Function}
+  \begin{algorithmic}
+    \Function{ode\_solve}{parameters}
+    \State total\_model = empty\_model
+    \State total\_model = combine\_vectors(total\_model,baseline\_model);
+    \State logistic\_transform\_parameters(parameters);
+    \For{i = 0 to length(epidemics)}
+    \State temp\_model = epidemics[i].ode\_solve(parameters);
+    \State total\_model = combine\_vectors(total\_model,
+    temp\_model);
+    \EndFor
+    \Return calculate\_sse(total\_model,current\_data);
+    \EndFunction
+    \end{algorithmic}
+  \label{fig:objective}
+\end{algorithm}
+    
+ Each Epidemic object also has its own set of ODEs. By calling the ``ode\_solve''
+function for each Epidemic object separately, we are able to easily
+include additional epidemic types without having to change the
+optimisation framework. It should also be noted that different
+candidate models require different logistic bounds. For example,
+whereas the beta value of a typical \emph{SIR} model might lie in the
+range of 0.0005 to 0.005, a typical beta value for an \emph{irSIR}
+model is between 0.00001 and 0.0001. Again, by including using an
+object oriented approach, we are able to bind the parameters of each
+sub epidemic depending on its type. A final observation regarding
+figure~\ref{fig:objective} is that it can easily be modified to return
+the calculated model rather than the SSE value.
+
+ 

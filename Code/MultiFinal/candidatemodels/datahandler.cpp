@@ -19,34 +19,56 @@ const double lowerT0 = 0;
 
 /* ================================ FINAL LEAST SQUARES ============================= */
 void Handler::initial_param_bound(){
-  betalower = 0.0001;
+ 
+  
+ betalower = 0.0001;
   betaupper = 0.005;
   gammalower = 0.05;
   gammaupper = 0.3;
 
-  gammaExpDown = 0.08;
-  gammaExpUp=0.25;
+  gammaExpDown = 0.05;
+  gammaExpUp=0.4;
  
-  betaSeirUp = 0.03;
+
+  betaSeirUp = 0.1;
+  betaSeirDown = 0.005;
+  gammaSeirUp = 0.2;
+  gammaSeirDown=0.01;
+  alphaSeirUp = 0.5;
+  alphaSeirDown=0.05;
+  
+
+  // FOR SYNTH
+  /*betaSeirUp = 0.02;
   betaSeirDown = 0.005;
   gammaSeirUp = 0.1;
   gammaSeirDown=0.01;
-  alphaSeirUp = 0.03;
-  alphaSeirDown=0.005;
-  
-  betaIrsirUp = 0.0005;
-  betaIrsirDown = 0.00005;
-  gammaIrsirUp = 0.0005;
-  gammaIrsirDown = 0.00005;
+  alphaSeirUp = 0.1;
+  alphaSeirDown=0.05;
 
-  betaSerirUp = 0.02;
+  betalower = 0.0005;
+  betaupper = 0.005;
+  gammalower = 0.05;
+  gammaupper = 0.2;
+
+  gammaExpDown = 0.1;
+  gammaExpUp=0.2;
+ 
+  */
+
+  betaIrsirUp = 0.0005;
+  betaIrsirDown = 0.00002;
+  gammaIrsirUp = 0.0005;
+  gammaIrsirDown = 0.00002;
+
+  betaSerirUp = 0.05;
   betaSerirDown = 0.0005;
-  gammaSerirUp = 0.05;
+  gammaSerirUp = 0.2;
   gammaSerirDown=0.005;
-  alphaSerirUp = 0.02;
-  alphaSerirDown=0.0001;
-  muSerirUp = 0.02;
-  muSerirDown = 0.0001;
+  alphaSerirUp = 0.1;
+  alphaSerirDown=0.001;
+  muSerirUp = 0.1;
+  muSerirDown = 0.001;
 
 }
 
@@ -56,31 +78,37 @@ void Handler::realtime_fit_multi(double targetRSq){
   Epidemic *toRemove, *bestFit; // Keep track of a newly created epidemic to allow deletion
   vector<EpiType> candidateModels,selectedTypes;
   vector<double> finalParams, finalParamsTemp; // Keep track of parameters from optimisation
-  vector<vector<double> > combinedResults, residuals, combinedResultsTemp,saveResults; // 
+  vector<vector<double> > combinedResults, residuals, combinedResultsTemp,saveResults, tomorrowData,ttData; // 
   vector<vector<vector<double> > > componentResults, componentResultsTemp;
-  double RSquare, tempRSquare, SSE, tempSSE;
+  double RSquare, tempRSquare, SSE, tempSSE, median_data;
   int iterations, tempIterations, remove_index;;
   double bestAICc, tempAICc, AICc,RMSE;
- 
-  initial_param_bound();
- 
+  double tomorrowSSE, ttSSE,futureSSE;
+  double tomorrowRSquare, ttRSquare,futureRSquare;
+  double MAD;
+  ofstream myfile; 
   
+  initial_param_bound();
+   
+
   /* List of candidate models to consider */
   candidateModels.push_back(spike);
   candidateModels.push_back(sir);
   candidateModels.push_back(seir);
-  //  candidateModels.push_back(serir);
+  //candidateModels.push_back(serir);
   //  candidateModels.push_back(irsir);
  
   // Start of model fitting process
   t1=clock();
   srand(time(NULL));
  
+
   // Start off with a baseline model of the mean of the first 4 points
   for(unsigned int j = 0; j <= 4; ++j){
     this->temp_data.push_back(this->current_data[j]);
   }
   this->baseModel = this->current_model = base_model(this->temp_data);
+  
   /*
    epidemics.push_back(new_epidemic(sir,6.0));
    epidemicSizes.push_back(4);
@@ -93,16 +121,22 @@ void Handler::realtime_fit_multi(double targetRSq){
 
   // For each time point in the current data set, carry out the fitting procedure
   for(unsigned int i = 5;i<this->current_data.size();++i){
+
+  
+  
     cout << endl << "-----------------" << endl;
     cout << "Iteration number " << i << endl;
     
     // Clear temp vector, temp epidemics and temp epidemic sizes
     this->temp_data.clear(); this->tempEpidemics.clear(); this->tempSizes.clear(); toRemove = NULL;
-
+    this->future_data.clear();
     // Store all data up to the current index and update epidemics with data
     for(unsigned int j = 0; j < i; ++j){
       this->temp_data.push_back(this->current_data[j]);
     } 
+    for(unsigned int j = temp_data.size();j<current_data.size();++j){
+      this->future_data.push_back(this->current_data[j]);
+    }
    
     for(unsigned int f = 0;f<this->epidemics.size();++f){
       this->epidemics[f]->update_data(this->temp_data);
@@ -251,17 +285,72 @@ void Handler::realtime_fit_multi(double targetRSq){
      
     plotGraphMulti(componentResults, combinedResults, this->temp_data, i, finalParams, RSquare, 2);        
     // Print out results for this iteration
+    // Get tomorrow's data
+    this->current_model = combinedResults;
+    if(temp_data.size() < current_data.size()){
+      //cout << "Stats and stuff" << endl;
+      tomorrowData.clear(); ttData.clear();
+      tomorrowData = temp_data;
+      tomorrowData.push_back(current_data[temp_data.size()]);
+      ttData = temp_data;
+      
+      ttData.push_back(ttData[ttData.size()-1]);
+      ttData[ttData.size()-1][0] = ttData[ttData.size()-2][0] + 1;
+      //      print_vector(ttData);
+      // cout << "1: " << tomorrowData.size() << endl;
+      //      print_vector(tomorrowData);
+      tomorrowSSE = calculate_SSE(current_model,tomorrowData);
+      //      cout << "2: " << ttData.size() << endl;
+      ttSSE = calculate_SSE(ttData, tomorrowData);
+      // cout << "3: " << future_data.size() << endl;
+      futureSSE = calculate_SSE(current_model,future_data);
+      // cout << "4" << endl;
+      tomorrowRSquare = 1- tomorrowSSE/SStot(tomorrowData,1);
+      // cout << "5" << endl;
+      ttRSquare = 1 - ttSSE/SStot(tomorrowData,1);
+      // cout << "6" << endl;
+      futureRSquare = 1 - futureSSE/SStot(future_data,1);
+      cout << "TT Rsq: " << ttRSquare << "; Future Rsq: " << futureRSquare << "; Tomorrow RSq: " << tomorrowRSquare << endl;
+    }
+       
+    median_data = calculate_median(temp_data);
+    MAD = calculate_MAD(temp_data, median_data);
+
+
     cout << "Final SSE was: " << SSE << endl;
     cout << "Final RSquare: " << RSquare << endl;
     cout << "Final parameters: ";
+
+
     printcon(finalParams) ;
     finalParams.push_back(RSquare);
-    finalParams.push_back(RMSE);
-    saveResults.push_back(finalParams);
+    finalParams.push_back(SSE);
     RMSE = sqrt((SSE/temp_data.size()));
+    finalParams.push_back(RMSE);
+    finalParams.push_back(MAD);
+    saveResults.push_back(finalParams);
+
+    if(temp_data.size() < current_data.size()){
+      finalParams.push_back(futureSSE);
+      finalParams.push_back(futureRSquare);
+      finalParams.push_back(tomorrowSSE);
+      finalParams.push_back(tomorrowRSquare);
+      finalParams.push_back(ttSSE);
+      finalParams.push_back(ttRSquare);
+    }
+
     cout << "RMSE: " << RMSE << endl;
+    cout << "MAD: " << MAD << endl;
     cout << endl << "-----------------" << endl;
-    this->current_model = combinedResults;
+   
+  
+    /* Save current parameters and statistics */
+    myfile.open ((saveLocation + "/results.csv"),std::ios_base::app); 
+    for(unsigned int j = 0;j < finalParams.size();++j){
+      myfile << finalParams[j] << ",";
+    }
+    myfile << "\n";
+    myfile.close();
   }
   t2=clock();
   t3 = (t2-t1)/CLOCKS_PER_SEC;
@@ -269,8 +358,23 @@ void Handler::realtime_fit_multi(double targetRSq){
   finalParams.push_back(double(t3));
   saveResults.push_back(finalParams);
   print_vector(saveResults);
+  
+  /* Save results */
 
-  save_all_results(saveResults, selectedTypes);
+  myfile.open ((saveLocation + "/results.csv"),std::ios_base::app); 
+  
+  for(unsigned int j = 0;j < finalParams.size();++j){
+    myfile << finalParams[j] << ",";
+  }
+  myfile << "\n";
+
+  for(unsigned int i = 0; i < selectedTypes.size();++i){
+    myfile << selectedTypes[i] << ",";
+  }
+  myfile << "\n";
+  myfile.close();
+  
+  //save_all_results(saveResults, selectedTypes);
   
   cout << "Time taken: " << (t2-t1)/CLOCKS_PER_SEC << endl << endl;
 }
@@ -286,7 +390,7 @@ double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<doub
   // If no epidemics have yet been detected, use the mean of the current data as the 
   // current model and return the corresponding SSE.
   if(epidemics.size() == 0){
-    results = base_model(temp_data);
+    results = base_model(baseModel);
     SSE = calculate_SSE(results, temp_data);
     parameters.clear();
     allResults.clear();
@@ -297,7 +401,7 @@ double Handler::optimiseEpidemics(vector<double> &parameters, vector<vector<doub
   parameters = generate_seed_parameters();
 
   // If there are epidemics to be fitted, perform X random fits and keep best fitting model
-  for(int index=0;index<10;index++){
+  for(int index=0;index<15;index++){
     // Create random seed parameters
     seedParams.clear();      
     seedParams = generate_seed_parameters();
@@ -347,7 +451,6 @@ double Handler::fitEpidemics(vector<double> params){
   current_model = empty_model;
   current_model = combine_vectors(current_model,this->baseModel);
   params = convert_all_params_back(params);
-  //printcon(params);
   for(unsigned int i = 0;i<epidemics.size();++i){
     tempParams.clear();
     temp_model.clear();
@@ -357,9 +460,9 @@ double Handler::fitEpidemics(vector<double> params){
       z++;
     }
     temp_model = epidemics[i]->ode_solve(tempParams);
+    //sense_check(temp_model);
     current_model = combine_vectors(current_model, temp_model);
   }
-  //cout << calculate_SSE(current_model,temp_data) << endl;
   return(calculate_SSE(current_model, temp_data));
 }
 
@@ -373,10 +476,11 @@ double Handler::fitEpidemicsMLE(vector<double> params){
     temp_model.clear();
     for(int x = 0;x<epidemics[i]->return_param_size();++x){
       tempParams.push_back(params[z]);
+      if(params[z] != params[z]) return 999999999999999.9;
       z++;
     }
-    //tempParams = convert_parameters_back(tempParams,epidemics[i]->return_parameters().size());
     temp_model = epidemics[i]->ode_solve(tempParams);
+    sense_check(temp_model);
     current_model = combine_vectors(current_model, temp_model);
   }
   return(dpois(current_model, temp_data));
@@ -395,11 +499,10 @@ vector<vector<double> > Handler::ode_solve(vector<double> params){
       tempParams.push_back(parr[z]);
       z++;
     }
-    //tempParams = convert_parameters_back(tempParams,epidemics[i]->return_parameters().size());
     temp_model = epidemics[i]->ode_solve_combined(tempParams);
+    sense_check(temp_model);
     overallResults = combine_vectors(overallResults,temp_model);
   }
-  //print_vector(overallResults);
   return(overallResults);
 }
 
@@ -409,7 +512,6 @@ vector<vector<vector<double> > > Handler::ode_solve_separate(vector<double> para
   vector<double> parr = convert_all_params_back(params);
   int x = 0;
   separateResults.push_back(this->baseModel);
-  //print_vector(baseModel);
   for(unsigned int i = 0;i<epidemics.size();++i){
     tempParams.clear();
     temp_model.clear();
@@ -417,9 +519,8 @@ vector<vector<vector<double> > > Handler::ode_solve_separate(vector<double> para
       tempParams.push_back(parr[x]);
       x++;
     }
-    //tempParams = convert_parameters_back(tempParams,epidemics[i]->return_parameters().size());
     temp_model = epidemics[i]->ode_solve_combined(tempParams);
-    //print_vector(temp_model);
+    sense_check(temp_model);
     separateResults.push_back(temp_model);
   }
   return(separateResults);
@@ -678,43 +779,44 @@ vector<double> Handler::rand_params(EpiType _type){
   switch(_type){
   case sir:
     beta = (rand()%300+50)/100000.0;
+    //beta = (rand()%200+60)/100000.0;
     if(beta > gammalower) gammalower = beta;
     else gammalower = 0.05;
-    gamma = (rand()%100+100)/1000.0;
+    gamma = (rand()%100+50)/1000.0;
     betaupper = gamma;
     params.push_back((beta));
     params.push_back((gamma));
     params.push_back((s0));
     break;
   case seir:
-    beta = (rand()%150+60)/10000.0;
-    gamma = (rand()%9+1)/100.0;
-    alpha = (rand()%150+60)/10000.0;
+    beta = (rand()%90+6)/1000.0;
+    gamma = (rand()%100+2)/1000.0;
+    alpha = (rand()%300+6)/10000.0;
     if(beta > gammaSeirDown) gammaSeirDown = beta;
     else gammaSeirDown = 0.01;
-    betaSeirUp = gamma;
     params.push_back((beta));
     params.push_back((alpha));
     params.push_back((gamma));
     params.push_back((s0));
     break;
   case spike:
-    gamma = (rand()%1+1)/10.0;
+    gamma = (rand()%30+5)/100.0;
+    //gamma = (rand()%30+5)/100.0;
     params.push_back((gamma));
     params.push_back((s0));
     break;
   case irsir:
-    beta = (rand()%100+10)/100000.0;
-    gamma = (rand()%100+10)/100000.0;
+    beta = (rand()%25+8)/100000.0;
+    gamma = (rand()%25+8)/100000.0;
     params.push_back((beta));
     params.push_back((gamma));
     params.push_back((s0));
     break;
   case serir:
-    beta = (rand()%14+1)/1000.0;
-    gamma = (rand()%40+6)/1000.0;
-    alpha = (rand()%13+5)/1000.0;
-    mu = (rand()%13+5)/1000.0;
+    beta = (rand()%42+6)/1000.0;
+    gamma = (rand()%140+10)/1000.0;
+    alpha = (rand()%80+5)/1000.0;
+    mu = (rand()%80+5)/1000.0;
     gammaSerirDown = beta;
     betaSerirUp = gamma;
     params.push_back((beta));
@@ -776,9 +878,6 @@ ofstream myfile;
 /* ================================= MATHEMATICAL FUNCTIONS =====================================*/
 
 
-
-
-
 /* Calculates and returns the sum of squared errors between to sets of data. Checks 
    the first column to see if on the same time point, and finds squared difference if
    so. If one dataset is at an earlier time point, use the entire squared value as
@@ -807,7 +906,7 @@ double Handler::calculate_SSE(vector<vector<double> > data1, vector<vector<doubl
     increment = 1;
   }
 
-  while(j < small.size()){
+  while(j < small.size() && i < big.size()){
     //If indices give same time point, find sse
     if(fabs(small[i][0]- big[j][0])<EPSILON){
       sse += pow((small[i][1] - big[j][1]),2.0);
@@ -816,12 +915,12 @@ double Handler::calculate_SSE(vector<vector<double> > data1, vector<vector<doubl
     }
     //If first dataset is still before second, full difference
     else if(small[i][0] < big[j][0]){
-      sse += pow(small[i][1],2.0);
+      //sse += pow(small[i][1],2.0);
       i++;
     }
     //...
     else{
-      sse += pow(big[j][1],2.0);
+      //sse += pow(big[j][1],2.0);
       j+=increment;
     }
   }
@@ -889,6 +988,47 @@ double Handler::calculate_mean(vector<vector<double> > data, int column){
   return(total/N);
 }
   
+double Handler::calculate_median(vector<vector<double> > data){
+  vector<double> sortedValues;
+  double temp;
+  double median = 0.0;
+  int size;
+  // Get all values to be sorted
+  for(unsigned int i = 0;i<data.size();++i){
+    sortedValues.push_back(data[i][1]);
+  }
+
+  size = sortedValues.size();
+
+  for(int i = size-1;i>0;--i){
+    for(int j = 0;j<i;++j){
+      if(sortedValues[j]>sortedValues[j+1]){
+	temp = sortedValues[j];
+	sortedValues[j] = sortedValues[j+1];
+	sortedValues[j+1] = temp;
+      }
+    }
+  }
+  
+  if(size%2 ==0){
+    median = (sortedValues[size/2] + sortedValues[(size/2)-1])/2.0;
+  }
+  else{
+    median = sortedValues[size/2];
+  }
+  return(median);
+}
+
+double Handler::calculate_MAD(vector<vector<double> > data, double median){
+  vector<vector<double> > temp = data;
+  
+  for(unsigned int i = 0;i<data.size();++i){
+    temp[i][0] = i;
+    temp[i][1] = abs(data[i][1] - median);
+  }
+  
+  return(1.4826*calculate_median(temp));
+}
 
 // Returns the SStot of a given column of a given set of data
 double Handler::SStot(vector<vector<double> > data, int column){
@@ -1244,6 +1384,16 @@ vector<Epidemic*> Handler::copy_epidemics(vector<Epidemic*> epi){
   return(tempEpi);
 }
 
+void Handler::sense_check(vector<vector<double> > &model){
+  if(model[0][1] > upperS0 || model[0][1] <0 || (model[0][1] != model[0][1])) model[0][1] = 0;
+  for(unsigned int j = 1;j<model.size();++j){
+    if(model[j][1] > upperS0 || model[j][1] <0 || (model[j][1] != model[j][1])){
+      model[j][1] = model[j-1][1];
+      cout << "Having to update value" << endl;
+    }
+  }
+}
+
 
 
 /* ================================ GRAPH PLOTTING FUNCTIONS ===================================*/
@@ -1267,7 +1417,7 @@ void Handler::plotGraphMulti(vector<vector<vector<double> > > finalResults, vect
   string name = saveLocation + "/output"; // The save location and general name of the graph to be saved
   string _index = to_string((index-1));
   string label, xlab, ylab,xlab2;
-  string colours[6] = {"blue","red","orange","cyan","violet","yellow"};
+  string colours[14] = {"blue","red","orange","cyan","violet","yellow","black","pink","green","gray","brown","blue","red","orange"};
   int j = 0;
   int xmax = current_data[current_data.size()-1][0];
 

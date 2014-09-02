@@ -65,7 +65,7 @@ public:
   double dpois(vector<vector<double> > model, vector<vector<double> > data);
   double poisson_pmf(const double k, const double lambda);
   double fitEpidemicsMLE(vector<double> params);
-
+  void sense_check(vector<vector<double> > &model);
 
   // Maths functions
   double aicc(double sse, int n, int k);

@@ -28,7 +28,7 @@ class Handler{
 private:
   vector<double> tempParams;
   vector<int> epidemicSizes, tempSizes;
-  vector<vector<double> > baseModel, current_data, current_model, temp_model, empty_model, temp_data;
+  vector<vector<double> > baseModel, current_data, current_model, temp_model, empty_model, temp_data, future_data;
   vector<Epidemic*> epidemics, tempEpidemics;
   bool useMLE, optimT0, optimI0, singleEpi, plot, save,useLogistic;
   bool activeBool = false;
@@ -77,6 +77,8 @@ public:
   void activate_last_epidemic();
   void save_all_results(vector<vector<double> > saveResults, vector<EpiType> selectedTypes);
   // Maths functions
+  double calculate_median(vector<vector<double> > data);
+  double calculate_MAD(vector<vector<double> > data, double median);
   vector<vector<double> > base_model(vector<vector<double> > data);
   double SStot(vector<vector<double> > data, int column);
   double calculate_mean(vector<vector<double> > data, int column);
@@ -89,7 +91,7 @@ public:
   double logit(double y, double xmin, double xmax);
 
   vector<double> convert_all_params_back(vector<double> pars);
-
+  void sense_check(vector<vector<double> > &model);
   // Graph plotting functions
   void plotGraph(vector<vector<double> > finalResults, vector<vector<double> > data, int index);
   void plotGraphMulti(vector<vector<vector<double> > > finalResults, vector<vector<double> > totalResults, vector<vector<double> > data, int index, vector<double> parameters, double _RSquare, int column);
