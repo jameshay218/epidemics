@@ -1,0 +1,33 @@
+Title: Multiple Epidemic (Synthedemic) Fitting Implementation, earlier version for synthetic data.
+Author: James Hay
+Data: 05/09/14
+Institution: Imperial College Department of Computing
+
+Note it is advised that you 'make clean' and 'make' the program before
+use. There should be no unusual library requirements (other than
+perhaps boost). Gnuplot-iostream should be provided in this folder to
+allow printing of graphs.
+
+The Multiple Epidemic fitting framework offers the following features:
+
+1. Iterative fitting of a .csv file of epidemic data. The file must be
+set to comma separated values only, and contain two columns. The first
+column must contain a time series from 0 to N, and the second column
+contains the data to be fit.
+
+2. Upon execution, the user is prompted to specify default or custom
+options. Default options are to use an SSE based fitting procedure,
+save graphs, and to not include IO in the fitting. The user may choose
+to include I0, not save graphs, and to use the MLE based fitting
+procedure instead (not currently functional).
+
+3. The user must specify a valid .csv file and valid save directory at
+run time. Providing invalid file locations will prompt the user to
+correct these.
+
+4. The program outputs a series of Gnuplot created graphs and a .csv
+file of the model fitting results at each time point to the provided directory.
+
+5. Note that to edit the list of considered candidate models, the code in datahandler.cpp must be changed, at the top of the "realtime_fit_multi" function.
+
+6. The fitting framework may not be able to characterise some datasets. In such cases, it might be necessary/possible to alter the seed parameter range (in rand params) and optimisation bounds for S0 and T0 (at the top of datahandler.cpp and the epidemic .hpp files respectively).

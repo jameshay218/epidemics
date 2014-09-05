@@ -1,0 +1,28 @@
+Author: James Hay
+Data: 05/09/14
+Institution: Imperial College Department of Computing
+
+Note it is advised that you 'make clean' and 'make' the program before
+use. There should be no unusual library requirements (other than
+perhaps boost). Gnuplot-iostream should be provided in this folder to
+allow printing of graphs.
+
+The Single Epidemic fitting framework offers the following features:
+
+1. Iterative fitting of a .csv file of epidemic data. The file must be
+set to comma separated values only, and contain two columns. The first
+column must contain a time series from 0 to N, and the second column
+contains the data to be fit.
+
+2. Upon execution, the user is prompted to specify default or custom
+options. Default options are to use an SSE based fitting procedure,
+save graphs, and to not include IO in the fitting. The user may choose
+to include I0, not save graphs, and to use the MLE based fitting
+procedure instead (not currently functional).
+
+3. The user must specify a valid .csv file and valid save directory at
+run time. Providing invalid file locations will prompt the user to
+correct these.
+
+4. The program outputs a series of Gnuplot created graphs and a .csv
+file of the model fitting results at each time point to the provided directory.
